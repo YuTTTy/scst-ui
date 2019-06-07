@@ -8,7 +8,7 @@
       <el-button type="primary" size="mini" @click="handleSave()" icon="el-icon-plus">新增</el-button>
       <br/>
       <br/>
-      <el-table :data="list" default-expand-all row-key="id" v-loading="loading"
+      <el-table :data="list" row-key="id" v-loading="loading"
                 element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading">
         <el-table-column prop="name" label="名称" width="180"></el-table-column>
         <el-table-column label="图标" width="180">
@@ -26,6 +26,7 @@
           </template>
         </el-table-column>
       </el-table>
+
       <!-- 子组件：新增、更新窗口 -->
       <save :sonData="sonData" @sonStatus="saveStatus"></save>
 
@@ -36,7 +37,6 @@
 <script>
   import Save from './save'
   import { getMenuTree, findMenu, deleteMenu} from "@/api/menu";
-
   export default {
     name: "index",
     components: {Save},
@@ -59,7 +59,6 @@
           type: type
         })
       },
-
       //获取权限按钮列表
       search() {
         this.loading = true;
@@ -68,7 +67,6 @@
           this.loading = false;
         })
       },
-
       //触发新增、更新，传递给子组件完成操作
       handleSave(id) {
         if (id == undefined) {
@@ -81,13 +79,11 @@
           })
         }
       },
-
       saveStatus(data) {
         if (data) {
           this.search();
         }
       },
-
       //触发删除按钮
       handleDelete(id) {
         this.$confirm('你确定永久删除此账户？, 是否继续?', '提示', {
@@ -119,4 +115,3 @@
     position: relative;
   }
 </style>
-
