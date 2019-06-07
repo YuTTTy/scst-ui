@@ -1,7 +1,6 @@
 <template>
   <div class="user-container">
     <el-card>
-      <!-- 功能按钮 -->
       <el-row :gutter="15" type="flex">
         <el-col :span="4">
           <el-input size="small" placeholder="输入部门名称搜索" v-model="filterText">
@@ -28,7 +27,6 @@
           <el-button type="warning" size="mini" @click="handleExcel()" icon="el-icon-download">导出</el-button>
           <br/>
           <br/>
-          <!-- 列表 -->
           <el-table ref="table" :data="list" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" stripe size="mini" tooltip-effect="dark" style="width: 100%">
             <el-table-column prop="username" label="用户名" min-width="250"></el-table-column>
             <el-table-column prop="deptName" label="部门" min-width="250"></el-table-column>
@@ -48,7 +46,7 @@
             </el-table-column>
           </el-table>
           <!-- 子组件：新增、更新窗口 -->
-          <save :sonData="sonData" @sonStatus="saveDialog"></save>
+          <save :sonData="sonData" @sonStatus="saveStatus"></save>
           <!-- 分页 -->
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
                       @pagination="search"></pagination>
@@ -63,8 +61,7 @@
   import {parseTime} from '@/utils/index'
   import Pagination from '@/components/Pagination'
   import Save from './save'
-  import { getUsers, findUser, addUser, deleteUser, updateUser, getUserMenus } from "@/api/user"
-  import { getRoles } from '@/api/role'
+  import { getUsers, findUser, deleteUser } from "@/api/user"
   import { getDeptTree } from '@/api/dept'
 
   export default {
@@ -72,13 +69,12 @@
     components: {Pagination,Save},
     data() {
       return {
-        list: [], //用户列表数据
-
+        list: [],
         filterText: '', //查询节点过滤
         searchEntity: {}, //查询实体类
         listQuery: {
           page: 1,
-          limit: 3,
+          limit: 10,
           importance: undefined,
           title: undefined,
           type: undefined,
@@ -86,7 +82,6 @@
         },
         total: 0,
         sonData: null,
-        saveDialog: false,
         //部门Tree数据
         deptTree: [{
           id: 0,
@@ -104,8 +99,6 @@
       //从vuex中获取登录用户数据
       ...mapGetters([
         'name',
-        'avatar',
-        'roles'
       ])
     },
     watch: {
@@ -156,12 +149,20 @@
       handleSave(id) {
         if (id == undefined) {
           //新增
-          this.sonData = {id: null, createTime: parseTime(new Date()), deptId: [], status: 'false'};
+          this.sonData = {id: null};
         } else {
           //更新
           findUser(id).then(response => {
             this.sonData = response.data;
           })
+        }
+      },
+
+      //子组件的状态Flag，子组件通过`this.$emit('sonStatus', val)`给父组件传值
+      //父组件通过`@sonStatus`的方法`status`监听到子组件传递的值
+      saveStatus(data) {
+        if (data) {
+          this.search();
         }
       },
 

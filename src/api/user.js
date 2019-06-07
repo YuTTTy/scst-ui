@@ -55,7 +55,7 @@ export function deleteUser(id) {
 
 export function updateUser(data) {
   return request({
-    url: '/user/edit',
+    url: '/user',
     method: 'put',
     data
   })
@@ -68,3 +68,9 @@ export function getUserMenus(name) {
   })
 }
 
+export function checkUserName(name, id) {
+  return request ({
+    url: `/user/checkName/${name}/${id}`,
+    method: 'get'
+  })
+}

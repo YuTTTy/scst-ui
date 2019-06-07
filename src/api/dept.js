@@ -22,9 +22,9 @@ export function addDept(data) {
   })
 }
 
-export function updateDept(id, data) {
+export function updateDept(data) {
   return request({
-    url: `/dept/${id}`,
+    url: `/dept`,
     method: 'put',
     data
   })
@@ -34,5 +34,12 @@ export function deleteDept(id) {
   return request({
     url: `/dept/${id}`,
     method: 'delete'
+  })
+}
+
+export function checkName(name, id) {
+  return request ({
+    url: `/dept/checkName/${name}/${id}`,
+    method: 'get'
   })
 }

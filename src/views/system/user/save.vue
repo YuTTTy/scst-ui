@@ -1,21 +1,23 @@
 <template>
   <el-dialog :title="dialogTitle" :before-close="handleClose" :visible.sync="dialogVisible" width="33%">
     <el-form ref="form" :model="form" :inline="true" :rules="rules" status-icon>
-      <el-form-item prop="username" label="用户名" label-width="80px" required>
+      <el-form-item prop="username" label="用户名" label-width="80px">
         <el-input v-model="form.username"></el-input>
-      </el-form-item>
-      <el-form-item prop="password" label="密码" label-width="80px" :rules="[{ required: true, message: '请输入密码', trigger: 'blur' }]">
-        <el-input v-model="form.password" type="password" :disabled="dialogTitle == '新增用户' ? false : true"></el-input>
-      </el-form-item>
-      <el-form-item label="手机" label-width="80px">
-        <el-input v-model="form.phone"></el-input>
       </el-form-item>
       <el-form-item label="状态" label-width="80px">
         <el-radio v-model="form.status" label="true">激活</el-radio>
         <el-radio v-model="form.status" label="false">锁定</el-radio>
       </el-form-item>
-      <el-form-item prop="roleIds" v-model="form.roleIds" label="角色" label-width="80px">
-        <el-select v-model="form.roleIds" multiple placeholder="请选择角色" style="width:100%" >
+      <el-form-item prop="password" label="密码" label-width="80px"
+                    :rules="{required: true, trigger: 'blur', message: '请输入登录密码'}">
+        <el-input v-model="form.password" type="password" :disabled="dialogTitle == '新增用户' ? false : true"></el-input>
+      </el-form-item>
+      <el-form-item label="手机" label-width="80px">
+        <el-input v-model="form.phone"></el-input>
+      </el-form-item>
+      <el-form-item prop="roleIds" label="角色" label-width="80px"
+                    :rules="{required: true, trigger: 'blur', message: '请选择用户角色'}">
+        <el-select v-model="form.roleIds" multiple placeholder="请选择角色" style="width:100%">
           <el-option
             v-for="item in roleTree"
             :key="item.id"
@@ -23,18 +25,18 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="描述" label-width="60px">
+      <el-form-item label="描述" label-width="64px">
         <el-input v-model="form.description"></el-input>
       </el-form-item>
-      <el-form-item prop="deptId" v-model="form.deptId" label="部门" label-width="80px" :rules="[{ required: true, message: '请选择所属部门', trigger: 'change' }]">
-        <el-tree :data="deptTree" ref="tree" highlight-current show-checkbox check-strictly
-                 :default-checked-keys="form.deptId"
-                 :default-expanded-keys="form.deptId"
+      <el-form-item prop="deptId" label="部门" style="min-width: 250px;" label-width="80px">
+        <el-tree :data="deptTree" v-model="form.deptId" ref="tree" highlight-current show-checkbox check-strictly
+                 :default-checked-keys="deptId"
+                 :default-expanded-keys="deptId"
                  node-key="id"
                  @check-change="checkChange"
                  :props="treeProps"></el-tree>
       </el-form-item>
-      <el-form-item v-model="form.avatar" label="头像" label-width="135px">
+      <el-form-item v-model="form.avatar" label="头像" label-width="90px" style="min-width: 250px;">
         <div class="avatar-uploader">
           <div @click="handleEditAvatar" class="el-upload">
             <img v-if="form.avatar" :src="form.avatar" class="avatar">
@@ -55,10 +57,9 @@
 </template>
 
 <script>
-  import {save, edit, upload} from '@/api/user'
-  import {parseTime} from '@/utils/index'
-  import { getRoles, findRole } from '@/api/role'
-  import { getDeptTree } from '@/api/dept'
+  import {addUser, updateUser, checkUserName} from '@/api/user'
+  import {getRoles} from '@/api/role'
+  import {getDeptTree} from '@/api/dept'
 
   export default {
     //父组件向子组件传值，通过props获取。
@@ -67,22 +68,30 @@
     props: ['sonData'],
 
     data() {
+      var validateName = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('用户名不能为空'))
+        }
+        checkUserName(value, this.form.id).then(response => {
+          if (response.data) {
+            callback();
+          } else {
+            callback(new Error('用户名已存在'))
+          }
+        })
+      }
       return {
         dialogVisible: false,
         dialogTitle: '新增用户',
-        localUpload: upload,
-        imgURL: '',
+        // localUpload: upload,
         form: {
           status: false
         },
+        deptId: [],
         roleTree: [],
         deptTree: [],
         rules: {
-          username: [{required: true, trigger: 'blur', message: '请输入登录账户'}],
-          password: [{required: true, trigger: 'blur', message: '请输入登录密码'}],
-          phone: [{required: true, trigger: 'blur', message: '请输入联系电话'}],
-          createTime: [{required: true, trigger: 'blur', message: '请选择创建时间'}],
-          avatar: [{required: true, trigger: 'blur', message: '请上传个性头像'}]
+          username: [{validator: validateName, required: true, trigger: 'blur'}],
         },
         treeProps: {
           children: 'children',
@@ -92,26 +101,36 @@
     },
     watch: {
       'sonData': function (newVal, oldVal) {
-        this.form = newVal
-        this.form.deptId = [this.form.deptId]
-        //清空表单的校验状态
-        if (this.$refs['form'] !== undefined) {
-          this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
-        }
-
-        this.dialogVisible = true
         if (newVal.id != null) {
+          this.form = newVal
+          this.form.status = this.form.status.toString()
+          this.deptId = [this.form.deptId]
+          this.form.password = 'xxx'
           this.dialogTitle = '修改用户'
         } else {
+          this.form.status = 'false'
           this.dialogTitle = '新增用户'
         }
+        this.dialogVisible = true
       },
     },
     created() {
+      //清空表单的校验状态
+      if (this.$refs['form'] !== undefined) {
+        this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
+      }
+
       getDeptTree().then(response => {
         this.deptTree = response.data
       })
-      getRoles().then(response => {
+      let obj = {
+        query: {
+          page: 0,
+          limit: 0,
+        },
+        data: {}
+      }
+      getRoles(obj.query, obj.data).then(response => {
         this.roleTree = response.data.rows
       })
     },
@@ -123,13 +142,19 @@
         })
       },
       clearForm() {
-        this.form.id = null
-        this.form.username = null
-        this.form.password = null
-        this.form.phone = null
-        this.form.avatar = null
-        this.imgURL = null
-        this.form.createTime = parseTime(new Date(), '')
+        this.form = {
+          id: null,
+          username: null,
+          password: null,
+          roleIds: [],
+          status: false,
+          phone: null,
+          deptId: []
+        }
+        this.$refs['tree'].setCheckedKeys([]);
+        if (this.$refs['form'] !== undefined) {
+          this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
+        }
       },
       handleClose() {
         this.clearForm();
@@ -138,11 +163,17 @@
       onSubmit(form) {
         this.$refs[form].validate((valid) => {
           if (valid) {
-            if (this.form.id === null) {
-              save(this.form).then(response => {
+            if (!this.deptId.length) {
+              this._notify('请选择用户所属部门', 'warning')
+              return;
+            }
+            this.form.deptId = this.deptId[0]
+            if (this.form.id == null) {
+              addUser(this.form).then(response => {
                 if (response.code === 200) {
                   this._notify(response.msg, 'success')
-                  this.clearForm()
+                  this.clearForm();
+                  //通知父组件刷新表格
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
@@ -150,10 +181,10 @@
                 }
               })
             } else {
-              edit(this.form).then(response => {
+              updateUser(this.form).then(response => {
                 if (response.code === 200) {
                   this._notify(response.msg, 'success')
-                  this.clearForm()
+                  this.clearForm();
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
@@ -182,11 +213,12 @@
       //Tree控件节点选中状态改变触发的事件
       checkChange(data, node, self) {
         if (node) {
-          this.form.deptId = [data.id];
+          this.deptId = [data.id];
+          this.form.deptId = this.deptId[0]
           this.$refs.tree.setCheckedNodes([data.id])
         } else {
           if (this.$refs.tree.getCheckedKeys().length == 0) {
-            this.form.deptId = [];
+            this.deptId = [];
           }
         }
       },

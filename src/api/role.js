@@ -23,9 +23,9 @@ export function addRole(data) {
   })
 }
 
-export function updateRole(id, data) {
+export function updateRole(data) {
   return request({
-    url: `/role/${id}`,
+    url: `/role`,
     method: 'put',
     data
   })
@@ -35,5 +35,12 @@ export function deleteRole(id) {
   return request({
     url: `/role/${id}`,
     method: 'delete'
+  })
+}
+
+export function checkRoleName(name, id) {
+  return request ({
+    url: `/role/checkName/${name}/${id}`,
+    method: 'get'
   })
 }

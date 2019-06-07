@@ -16,7 +16,9 @@
             <br/>
             <br/>
             <!-- 列表 -->
-            <el-table ref="table" :data="list" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" stripe size="mini" tooltip-effect="dark" style="width: 100%">
+            <el-table ref="table" :data="list" v-loading="loading" highlight-current-row
+                      @current-change="handleCurrentChange"
+                      element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" stripe size="mini" tooltip-effect="dark" style="width: 100%">
               <el-table-column prop="name" label="名称" min-width="250"></el-table-column>
               <el-table-column prop="description" label="描述" min-width="250"></el-table-column>
               <el-table-column prop="createTime" label="创建时间" min-width="300"></el-table-column>
@@ -37,15 +39,16 @@
         <el-col :span="7">
           <el-card>
             <div slot="header">
-              <label>{{switchLabel}}</label>
-              <el-button style="float: right;margin-top: -4px;" size="mini" type="primary">保存</el-button>
+              <label>菜单权限</label>
+              <el-button @click="updateMenus" :disabled="this.form.menuIds == undefined ? true : false" style="float: right;margin-top: -4px;" size="mini" icon="el-icon-check" type="primary">保存</el-button>
             </div>
-            <el-tree class="filter-tree"
-                     :data="menuTree" :props="treeProps"
-                     @node-click="handleDeptNodeClick"
-                     show-checkbox
+            <el-tree :data="menuTree" :props="treeProps"
+                     node-key="id"
+                     :default-checked-keys="form.menuIds"
+                     :default-expanded-keys="form.menuIds"
+                     highlight-current show-checkbox check-strictly
                      @check-change="handleCheckChange"
-                     :expand-on-click-node="false" :filter-node-method="filterDeptNode" ref="tree"></el-tree>
+                     :expand-on-click-node="false" ref="tree"></el-tree>
           </el-card>
         </el-col>
       </el-row>
@@ -57,7 +60,7 @@
   import {parseTime} from '@/utils/index'
   import Pagination from '@/components/Pagination'
   import Save from './save'
-  import { getRoles, findRole, deleteRole } from "@/api/role"
+  import { getRoles, findRole, deleteRole, updateRole } from "@/api/role"
   import { getMenuTree } from "@/api/menu";
 
   export default {
@@ -66,8 +69,6 @@
     data() {
       return {
         list: [], //用户列表数据
-
-        filterText: '', //查询节点过滤
         searchEntity: {}, //查询实体类
         listQuery: {
           page: 1,
@@ -85,12 +86,8 @@
           children: 'children',
           label: 'name'
         },
+        form: {},
         loading: true,
-      }
-    },
-    watch: {
-      filterText(val) {
-        this.$refs.tree.filter(val);
       }
     },
     created() {
@@ -110,24 +107,21 @@
           this.menuTree = response.data
         })
       },
-
-      //过滤节点
-      filterDeptNode(value, data) {
-        if (!value) return true;
-        return data.name.indexOf(value) !== -1;
-      },
-      //节点点击事件
-      handleDeptNodeClick(data) {
-        this.searchEntity.deptId = data.id
-        this.search();
-      },
       //节点勾选事件
       handleCheckChange(data) {
-
+        if (this.form.menuIds != undefined && this.form.menuIds != null) {
+          this.form.menuIds = this.$refs.tree.getCheckedKeys()
+        }
       },
-      //切换右侧Tree
-      switchNode(flag) {
-        this.switchLabel = flag
+      //触发表格行单选
+      handleCurrentChange(val) {
+        if (val != null) {
+          this.form = {}
+          this.$refs.tree.setCheckedKeys([]);
+          findRole(val.id).then(response => {
+            this.form = response.data;
+          })
+        }
       },
 
       //获取用户列表
@@ -144,6 +138,7 @@
       handleSave(id) {
         if (id == undefined) {
           //新增
+          this.$refs.tree.setCheckedKeys([]);
           this.sonData = {id: null, createTime: parseTime(new Date()), deptId: [], status: 'false'};
         } else {
           //更新
@@ -151,6 +146,24 @@
             this.sonData = response.data;
           })
         }
+      },
+
+      //更新角色权限列表
+      updateMenus() {
+        if (!this.form.menuIds.length) {
+          this._notify('请选择该角色对应的权限', 'warning')
+          return;
+        }
+        updateRole(this.form).then(response => {
+          this.search();
+          this.$refs.tree.setCheckedKeys([]);
+          this.form = {}
+          if (response.code == 200) {
+            this._notify('更新权限列表成功', 'success')
+          } else {
+            this._notify('更新权限列表失败', 'error')
+          }
+        })
       },
 
       //触发删除按钮
@@ -164,7 +177,7 @@
             if (response.code == 200) {
               this._notify('删除成功', 'success')
             } else {
-              this._notify(response.msg, 'error')
+              this._notify('删除失败', 'error')
             }
             this.$refs.table.clearSelection();
             this.search()
@@ -173,12 +186,6 @@
           this._notify('已取消删除', 'info')
         });
       },
-
-      //触发导出按钮
-      handleExcel() {
-
-      },
-
     },
   }
 </script>

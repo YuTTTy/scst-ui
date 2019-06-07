@@ -11,7 +11,7 @@ export function getMenus(query, data) {
 /**
  * 获取菜单权限Tree
  */
-export function getTree() {
+export function getMenuTree() {
   return request({
     url: '/menu/tree',
     method: 'get'
@@ -42,9 +42,16 @@ export function deleteMenu(id) {
 
 export function updateMenu(data) {
   return request({
-    url: '/menu/edit',
+    url: '/menu',
     method: 'put',
     data
+  })
+}
+
+export function checkName(name, id) {
+  return request ({
+    url: `/menu/checkName/${name}/${id}`,
+    method: 'get'
   })
 }
 
