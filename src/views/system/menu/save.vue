@@ -1,21 +1,17 @@
 <template>
   <el-dialog :title="dialogTitle" :before-close="handleClose" :visible.sync="dialogVisible" width="33%">
     <el-form ref="form" :model="form" :rules="rules" status-icon>
-      <el-form-item prop="name" label="角色名称" label-width="80px" required>
+      <el-form-item prop="name" label="菜单名称" label-width="80px">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
-      <el-form-item prop="description" label="角色描述" label-width="80px">
+      <el-form-item prop="description" label="菜单描述" label-width="80px">
         <el-input v-model="form.description"></el-input>
       </el-form-item>
-      <el-form-item prop="deptId" v-model="form.menuIds" label="菜单权限" label-width="80px">
-        <el-tree :data="menuTree" ref="tree" highlight-current show-checkbox check-strictly
-                 :default-checked-keys="form.menuIds"
-                 :default-expanded-keys="form.menuIds"
-                 node-key="id"
-                 @check-change="checkChange"
-                 :props="treeProps"></el-tree>
-      </el-form-item>
     </el-form>
+    <div v-for="item of svgIcons" :key="item">
+      <svg-icon :icon-class="item" class-name="disabled" />
+      <span>{{ item }}</span>
+    </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="handleClose">
         取消
@@ -28,9 +24,8 @@
 </template>
 
 <script>
-  import {save, edit, upload} from '@/api/user'
-  import { getDeptTree } from '@/api/dept'
-  import  { getTree } from "@/api/menu";
+  import svgIcons from './svg-icons'
+  import {addRole, updateRole, checkRoleName} from '@/api/role'
 
   export default {
     //父组件向子组件传值，通过props获取。
@@ -39,19 +34,25 @@
     props: ['sonData'],
 
     data() {
+      var validateName = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请输入菜单名称'))
+        }
+        checkRoleName(value, this.form.id).then(response => {
+          if (response.data) {
+            callback();
+          } else {
+            callback(new Error('菜单名已存在'))
+          }
+        })
+      }
       return {
+        svgIcons,
         dialogVisible: false,
-        dialogTitle: '新增用户',
-        localUpload: upload,
-        imgURL: '',
-        form: {
-          status: false
-        },
-        menuTree: [],
-        roleTree: [],
-        deptTree: [],
+        dialogTitle: '新增菜单',
+        form: {},
         rules: {
-          name: [{required: true, trigger: 'blur', message: '请输入角色名称'}],
+          name: [{validator: validateName, required: true, trigger: 'blur'}],
         },
         treeProps: {
           children: 'children',
@@ -61,26 +62,20 @@
     },
     watch: {
       'sonData': function (newVal, oldVal) {
-        this.form = newVal
-        //清空表单的校验状态
-        if (this.$refs['form'] !== undefined) {
-          this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
-        }
-
-        getTree().then(response => {
-          this.menuTree = response.data
-        })
-        getDeptTree().then(response => {
-          this.deptTree = response.data
-        })
-
-        this.dialogVisible = true
         if (newVal.id != null) {
-          this.dialogTitle = '修改角色'
+          this.form = newVal
+          this.dialogTitle = '修改菜单'
         } else {
-          this.dialogTitle = '新增角色'
+          this.dialogTitle = '新增菜单'
         }
+        this.dialogVisible = true
       },
+    },
+    created() {
+      //清空表单的校验状态
+      if (this.$refs['form'] !== undefined) {
+        this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
+      }
     },
     methods: {
       _notify(message, type) {
@@ -90,9 +85,7 @@
         })
       },
       clearForm() {
-        this.form.id = null
-        this.form.name = null
-        this.form.description = null
+        this.form = {}
       },
       handleClose() {
         this.clearForm();
@@ -101,8 +94,8 @@
       onSubmit(form) {
         this.$refs[form].validate((valid) => {
           if (valid) {
-            if (this.form.id === null) {
-              save(this.form).then(response => {
+            if (this.form.id == null) {
+              addRole(this.form).then(response => {
                 if (response.code === 200) {
                   this._notify(response.msg, 'success')
                   this.clearForm()
@@ -113,7 +106,7 @@
                 }
               })
             } else {
-              edit(this.form).then(response => {
+              updateRole(this.form).then(response => {
                 if (response.code === 200) {
                   this._notify(response.msg, 'success')
                   this.clearForm()
@@ -129,11 +122,6 @@
             return false;
           }
         });
-      },
-
-      //Tree控件节点选中状态改变触发的事件
-      checkChange(data, node, self) {
-        this.form.menuIds = this.$refs.tree.getCheckedKeys();
       },
     }
   }

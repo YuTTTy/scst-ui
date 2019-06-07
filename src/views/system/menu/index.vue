@@ -8,11 +8,12 @@
       <el-button type="primary" size="mini" @click="handleSave()" icon="el-icon-plus">新增</el-button>
       <br/>
       <br/>
-      <el-table :data="list" style="width: 100%;margin-bottom: 20px;" row-key="id">
+      <el-table :data="list" default-expand-all row-key="id" v-loading="loading"
+                element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading">
         <el-table-column prop="name" label="名称" width="180"></el-table-column>
         <el-table-column label="图标" width="180">
           <template slot-scope="scope">
-            <svg-icon :icon-class="scope.row.icon" class-name="disabled" />
+            <svg-icon v-if="scope.row.icon != null" :icon-class="scope.row.icon" class-name="disabled" />
           </template>
         </el-table-column>
         <el-table-column prop="url" label="链接地址" width="180"></el-table-column>
@@ -25,17 +26,14 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-for="item of svgIcons" :key="item">
-        <svg-icon :icon-class="item" class-name="disabled" />
-        <span>{{ item }}</span>
-      </div>
+      <!-- 子组件：新增、更新窗口 -->
+      <save :sonData="sonData" @sonStatus="saveStatus"></save>
+
     </el-card>
   </div>
 </template>
 
 <script>
-  import svgIcons from './svg-icons'
-  import {parseTime} from '@/utils/index'
   import Save from './save'
   import { getMenuTree, findMenu, deleteMenu} from "@/api/menu";
 
@@ -44,9 +42,7 @@
     components: {Save},
     data() {
       return {
-        svgIcons,
-
-        list: [], //用户列表数据
+        list: null, //用户列表数据
         searchEntity: {}, //查询实体类
         sonData: null,
         saveDialog: false,
@@ -77,12 +73,18 @@
       handleSave(id) {
         if (id == undefined) {
           //新增
-          this.sonData = {id: null, createTime: parseTime(new Date()), deptId: [], status: 'false'};
+          this.sonData = {id: null};
         } else {
           //更新
           findMenu(id).then(response => {
             this.sonData = response.data;
           })
+        }
+      },
+
+      saveStatus(data) {
+        if (data) {
+          this.search();
         }
       },
 

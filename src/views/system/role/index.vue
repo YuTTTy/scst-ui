@@ -30,7 +30,7 @@
               </el-table-column>
             </el-table>
             <!-- 子组件：新增、更新窗口 -->
-            <save :sonData="sonData" @sonStatus="saveDialog"></save>
+            <save :sonData="sonData" @sonStatus="saveStatus"></save>
             <!-- 分页 -->
             <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
                         @pagination="search"></pagination>
@@ -57,7 +57,6 @@
 </template>
 
 <script>
-  import {parseTime} from '@/utils/index'
   import Pagination from '@/components/Pagination'
   import Save from './save'
   import { getRoles, findRole, deleteRole, updateRole } from "@/api/role"
@@ -72,7 +71,7 @@
         searchEntity: {}, //查询实体类
         listQuery: {
           page: 1,
-          limit: 3,
+          limit: 10,
           importance: undefined,
           title: undefined,
           type: undefined,
@@ -120,6 +119,9 @@
           this.$refs.tree.setCheckedKeys([]);
           findRole(val.id).then(response => {
             this.form = response.data;
+            if (response.data.menuIds.length == 0 || response.data.menuIds[0] == null) {
+              this.form.menuIds = []
+            }
           })
         }
       },
@@ -139,12 +141,18 @@
         if (id == undefined) {
           //新增
           this.$refs.tree.setCheckedKeys([]);
-          this.sonData = {id: null, createTime: parseTime(new Date()), deptId: [], status: 'false'};
+          this.sonData = {id: null};
         } else {
           //更新
           findRole(id).then(response => {
             this.sonData = response.data;
           })
+        }
+      },
+
+      saveStatus(data) {
+        if (data) {
+          this.search();
         }
       },
 

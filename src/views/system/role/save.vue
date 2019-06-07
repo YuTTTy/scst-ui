@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import {addRole, updateRole} from '@/api/role'
+  import {addRole, updateRole, checkRoleName} from '@/api/role'
 
   export default {
     //父组件向子组件传值，通过props获取。
@@ -29,12 +29,24 @@
     props: ['sonData'],
 
     data() {
+      var validateName = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请输入角色名称'))
+        }
+        checkRoleName(value, this.form.id).then(response => {
+          if (response.data) {
+            callback();
+          } else {
+            callback(new Error('角色名已存在'))
+          }
+        })
+      }
       return {
         dialogVisible: false,
-        dialogTitle: '新增橘色',
+        dialogTitle: '新增角色',
         form: {},
         rules: {
-          name: [{required: true, trigger: 'blur', message: '请输入角色名称'}],
+          name: [{validator: validateName, required: true, trigger: 'blur'}],
         },
         treeProps: {
           children: 'children',
@@ -44,19 +56,20 @@
     },
     watch: {
       'sonData': function (newVal, oldVal) {
-        this.form = newVal
-        //清空表单的校验状态
-        if (this.$refs['form'] !== undefined) {
-          this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
-        }
-
-        this.dialogVisible = true
         if (newVal.id != null) {
+          this.form = newVal
           this.dialogTitle = '修改角色'
         } else {
           this.dialogTitle = '新增角色'
         }
+        this.dialogVisible = true
       },
+    },
+    created() {
+      //清空表单的校验状态
+      if (this.$refs['form'] !== undefined) {
+        this.$refs['form'].resetFields(); //经查询：可能是由于对象还没有生成，导致误读了空对象而报错
+      }
     },
     methods: {
       _notify(message, type) {
@@ -66,9 +79,7 @@
         })
       },
       clearForm() {
-        this.form.id = null
-        this.form.name = null
-        this.form.description = null
+        this.form = {}
       },
       handleClose() {
         this.clearForm();
@@ -77,7 +88,7 @@
       onSubmit(form) {
         this.$refs[form].validate((valid) => {
           if (valid) {
-            if (this.form.id === null) {
+            if (this.form.id == null) {
               addRole(this.form).then(response => {
                 if (response.code === 200) {
                   this._notify(response.msg, 'success')
