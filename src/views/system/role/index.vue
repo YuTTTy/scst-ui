@@ -67,8 +67,8 @@
     components: {Pagination, Save},
     data() {
       return {
-        list: [], //用户列表数据
-        searchEntity: {}, //查询实体类
+        list: [],
+        searchEntity: {},
         listQuery: {
           page: 1,
           limit: 10,
@@ -176,7 +176,7 @@
 
       //触发删除按钮
       handleDelete(id) {
-        this.$confirm('你确定永久删除此账户？, 是否继续?', '提示', {
+        this.$confirm('你确定永久删除此角色？, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getRoles(query, data) {
   return request({
-    url: `/role/list?page=${query.page}&limit=${query.limit}`,
+    url: `/system/role/list?page=${query.page}&limit=${query.limit}`,
     method: 'post',
     data
   })
@@ -10,14 +10,14 @@ export function getRoles(query, data) {
 
 export function findRole(id) {
   return request({
-    url: `/role/${id}`,
+    url: `/system/role/${id}`,
     method: 'get'
   })
 }
 
 export function addRole(data) {
   return request({
-    url: '/role',
+    url: '/system/role',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function addRole(data) {
 
 export function updateRole(data) {
   return request({
-    url: `/role`,
+    url: `/system/role`,
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateRole(data) {
 
 export function deleteRole(id) {
   return request({
-    url: `/role/${id}`,
+    url: `/system/role/${id}`,
     method: 'delete'
   })
 }
 
 export function checkRoleName(name, id) {
   return request ({
-    url: `/role/checkName/${name}/${id}`,
+    url: `/system/role/checkName/${name}/${id}`,
     method: 'get'
   })
 }

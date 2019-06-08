@@ -2,10 +2,10 @@
   <el-dialog :title="dialogTitle" :before-close="handleClose" :visible.sync="dialogVisible" width="33%">
     <el-form ref="form" :model="form" :rules="rules" status-icon>
       <el-form-item prop="name" label="角色名称" label-width="80px">
-        <el-input v-model="form.name"></el-input>
+        <el-input v-model="form.name" placeholder="请输入角色名称"></el-input>
       </el-form-item>
       <el-form-item prop="description" label="角色描述" label-width="80px">
-        <el-input v-model="form.description"></el-input>
+        <el-input v-model="form.description" placeholder="请输入角色描述"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">

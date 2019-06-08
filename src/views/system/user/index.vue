@@ -58,7 +58,6 @@
 
 <script>
   import { mapGetters } from 'vuex'
-  import {parseTime} from '@/utils/index'
   import Pagination from '@/components/Pagination'
   import Save from './save'
   import { getUsers, findUser, deleteUser } from "@/api/user"

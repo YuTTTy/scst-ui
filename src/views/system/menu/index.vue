@@ -1,10 +1,6 @@
 <template>
   <div class="menu-container">
     <el-card>
-      <el-input size="small" v-model="searchEntity.name" style="width:20%" placeholder="请输入名称查询">
-        <i slot="prefix" class="el-input__icon el-icon-search"></i>
-      </el-input>
-      <el-button @click="search" size="mini" icon="el-icon-search" type="success">搜索</el-button>
       <el-button type="primary" size="mini" @click="handleSave()" icon="el-icon-plus">新增</el-button>
       <br/>
       <br/>
@@ -17,6 +13,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="url" label="链接地址" width="180"></el-table-column>
+        <el-table-column prop="permission" label="权限标识" width="180"></el-table-column>
         <el-table-column prop="component" label="组件地址" width="180"></el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="250"></el-table-column>
         <el-table-column label="操作" align="center" min-width="150">
@@ -42,8 +39,7 @@
     components: {Save},
     data() {
       return {
-        list: null, //用户列表数据
-        searchEntity: {}, //查询实体类
+        list: null,
         sonData: null,
         saveDialog: false,
         loading: true,
@@ -62,7 +58,7 @@
       //获取权限按钮列表
       search() {
         this.loading = true;
-        getMenuTree(this.listQuery, this.searchEntity).then(response => {
+        getMenuTree().then(response => {
           this.list = response.data
           this.loading = false;
         })
@@ -86,19 +82,18 @@
       },
       //触发删除按钮
       handleDelete(id) {
-        this.$confirm('你确定永久删除此账户？, 是否继续?', '提示', {
+        this.$confirm('你确定永久删除此菜单？, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           deleteMenu(id).then(response => {
+            this.search()
             if (response.code == 200) {
               this._notify('删除成功', 'success')
             } else {
-              this._notify(response.msg, 'error')
+              this._notify('删除失败', 'error')
             }
-            this.$refs.table.clearSelection();
-            this.search()
           })
         }).catch(() => {
           this._notify('已取消删除', 'info')

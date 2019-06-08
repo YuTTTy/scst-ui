@@ -2,21 +2,28 @@ import request from '@/utils/request'
 
 export function getDepts() {
   return request({
-    url: '/dept/list',
+    url: '/system/dept/list',
     method: 'get'
   })
 }
 
 export function getDeptTree() {
   return request({
-    url: '/dept/tree',
+    url: '/system/dept/tree',
+    method: 'get'
+  })
+}
+
+export function findDept(id) {
+  return request({
+    url: `/system/dept/${id}`,
     method: 'get'
   })
 }
 
 export function addDept(data) {
   return request({
-    url: '/dept',
+    url: '/system/dept',
     method: 'post',
     data
   })
@@ -24,7 +31,7 @@ export function addDept(data) {
 
 export function updateDept(data) {
   return request({
-    url: `/dept`,
+    url: `/system/dept`,
     method: 'put',
     data
   })
@@ -32,14 +39,14 @@ export function updateDept(data) {
 
 export function deleteDept(id) {
   return request({
-    url: `/dept/${id}`,
+    url: `/system/dept/${id}`,
     method: 'delete'
   })
 }
 
-export function checkName(name, id) {
+export function checkDeptName(name, id) {
   return request ({
-    url: `/dept/checkName/${name}/${id}`,
+    url: `/system/dept/checkName/${name}/${id}`,
     method: 'get'
   })
 }

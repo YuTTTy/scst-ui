@@ -2,7 +2,7 @@
   <el-dialog :title="dialogTitle" :before-close="handleClose" :visible.sync="dialogVisible" width="33%">
     <el-form ref="form" :model="form" :inline="true" :rules="rules" status-icon>
       <el-form-item prop="username" label="用户名" label-width="80px">
-        <el-input v-model="form.username"></el-input>
+        <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item label="状态" label-width="80px">
         <el-radio v-model="form.status" label="true">激活</el-radio>
@@ -10,7 +10,7 @@
       </el-form-item>
       <el-form-item prop="password" label="密码" label-width="80px"
                     :rules="{required: true, trigger: 'blur', message: '请输入登录密码'}">
-        <el-input v-model="form.password" type="password" :disabled="dialogTitle == '新增用户' ? false : true"></el-input>
+        <el-input v-model="form.password" type="password" :disabled="dialogTitle == '新增用户' ? false : true" placeholder="请输入登录密码"></el-input>
       </el-form-item>
       <el-form-item label="手机" label-width="80px">
         <el-input v-model="form.phone"></el-input>
