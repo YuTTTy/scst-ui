@@ -4,7 +4,7 @@
 
 <script>
     export default {
-        name: "redis"
+        name: "index"
     }
 </script>
 

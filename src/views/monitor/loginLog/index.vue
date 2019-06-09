@@ -4,7 +4,7 @@
 
 <script>
     export default {
-        name: "loginLog"
+        name: "index"
     }
 </script>
 

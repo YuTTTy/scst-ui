@@ -1,11 +1,19 @@
 <template>
-  <h1>Spring Boot Admin</h1>
+  <targetWindow :targetUrl="url"></targetWindow>
 </template>
 
 <script>
-    export default {
-        name: "admin"
+  import targetWindow from '@/components/Iframe'
+
+  export default {
+    components: {targetWindow},
+    name: "admin",
+    data() {
+      return {
+        url: 'http://localhost:3000'
+      }
     }
+  }
 </script>
 
 <style scoped>

@@ -1,9 +1,22 @@
 <template>
   <div class="logs-container">
     <el-card>
-      <el-input size="small" v-model="searchEntity.name" style="width:20%" placeholder="请输入角色名查询">
+      <el-input size="small" v-model="searchEntity.username" style="width:13%" placeholder="请输入操作用户查询">
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>
+      <el-input size="small" v-model="searchEntity.operation" style="width:13%" placeholder="请输入日志描述查询">
+        <i slot="prefix" class="el-input__icon el-icon-search"></i>
+      </el-input>
+      <el-input size="small" v-model="searchEntity.location" style="width:13%" placeholder="请输入地理位置查询">
+        <i slot="prefix" class="el-input__icon el-icon-search"></i>
+      </el-input>
+      <el-date-picker size="small" value-format="yyyy-MM-dd HH:mm:ss"
+                      v-model="searchEntity.timeField"
+                      type="daterange"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期">
+      </el-date-picker>
       <el-button @click="search" size="mini" icon="el-icon-search" type="success">搜索</el-button>
       <br/>
       <br/>
@@ -38,7 +51,7 @@
   import { getLogs, deleteLog} from "@/api/logs";
 
   export default {
-    name: "logs",
+    name: "index",
     components: {Pagination},
     data() {
       return {
@@ -70,6 +83,10 @@
       //获取权限按钮列表
       search() {
         this.loading = true;
+        if (this.searchEntity.timeField != null) {
+          let timeField = this.searchEntity.timeField[0] + "," + this.searchEntity.timeField[1];
+          this.searchEntity.timeField = timeField;
+        }
         getLogs(this.listQuery, this.searchEntity).then(response => {
           this.list = response.data.rows
           this.total = response.data.total

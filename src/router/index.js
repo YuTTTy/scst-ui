@@ -97,6 +97,19 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/doc',
+    component: Layout,
+    children: [
+      {
+        path: 'swagger',
+        component: () => import('@/views/doc/index'),
+        name: 'doc',
+        meta: { title: '接口文档', icon: 'documentation' }
+      }
+    ]
+  },
+
+  {
     path: '/system',
     component: Layout,
     name: 'system',
@@ -145,31 +158,31 @@ export const asyncRoutes = [
     children: [
       {
         path: 'online',
-        component: () => import('@/views/monitor/online'),
+        component: () => import('@/views/monitor/online/index'),
         name: 'online',
         meta: { title: '在线用户', icon: 'online' }
       },
       {
         path: 'logs',
-        component: () => import('@/views/monitor/logs'),
+        component: () => import('@/views/monitor/logs/index'),
         name: 'logs',
         meta: { title: '操作日志', icon: 'log' }
       },
       {
         path: 'loginLog',
-        component: () => import('@/views/monitor/loginLog'),
+        component: () => import('@/views/monitor/loginLog/index'),
         name: 'loginLog',
         meta: { title: '登录日志', icon: 'login-log' }
       },
       {
         path: 'errorLog',
-        component: () => import('@/views/monitor/errorLog'),
+        component: () => import('@/views/monitor/errorLog/index'),
         name: 'errorLog',
         meta: { title: '错误日志', icon: 'error-log' }
       },
       {
         path: 'redis',
-        component: () => import('@/views/monitor/redis'),
+        component: () => import('@/views/monitor/redis/index'),
         name: 'redis',
         meta: { title: 'Redis监控', icon: 'redis' }
       },
