@@ -1,8 +1,24 @@
 import request from '@/utils/request'
 
-export function getToken() {
+export function getFiles(query, data) {
   return request({
-    url: '/system/qiniu/upload/token', // 假地址 自行替换
-    method: 'get'
+    url: `/component/qiniu/list`,
+    method: 'post',
+    data
+  })
+}
+
+export function deleteFile(id) {
+  return request({
+    url: `/component/qiniu/${id}`,
+    method: 'delete'
+  })
+}
+
+export function updateFile(data) {
+  return request({
+    url: '/component/qiniu',
+    method: 'put',
+    data
   })
 }

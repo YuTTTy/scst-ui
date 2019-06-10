@@ -147,6 +147,43 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/component',
+    component: Layout,
+    name: 'component',
+    meta: {
+      title: '系统组件',
+      icon: 'component'
+      // roles: ['admin', 'editor'] // you can set roles in root nav
+    },
+    children: [
+      {
+        path: 'mail',
+        component: () => import('@/views/component/mail/index'),
+        name: 'mail',
+        meta: { title: '邮件服务', icon: 'email' }
+      },
+      {
+        path: 'alipay',
+        component: () => import('@/views/component/mail/index'),
+        name: 'alipay',
+        meta: { title: '支付服务', icon: 'alipay' }
+      },
+      {
+        path: 'chat',
+        component: () => import('@/views/component/chat/index'),
+        name: 'chat',
+        meta: { title: '在线聊天', icon: 'chat' }
+      },
+      {
+        path: 'qiniu',
+        component: () => import('@/views/component/chat/index'),
+        name: 'qiniu',
+        meta: { title: '七牛云', icon: 'qiniu' }
+      },
+    ]
+  },
+
+  {
     path: '/monitor',
     component: Layout,
     name: 'monitor',
