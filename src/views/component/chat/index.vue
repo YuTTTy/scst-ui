@@ -12,7 +12,6 @@
 </template>
 
 <script>
-  import {sendEmail} from "@/api/component";
   import Description from './components/description'
   import Chat from './components/chat'
 
@@ -25,22 +24,6 @@
       }
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
-      send(form) {
-        this.$refs[form].validate((valid) => {
-          if (valid) {
-
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      }
     }
   }
 </script>

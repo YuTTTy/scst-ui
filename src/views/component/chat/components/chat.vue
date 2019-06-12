@@ -3,8 +3,8 @@
     <div class="sidebar">
       <div class="card">
         <header>
-          <img class="avatar" width="40" height="40" alt="TyCoding" src="http://cdn.tycoding.cn/author.png">
-          <p class="name">TyCoding</p>
+          <img class="avatar" width="40" height="40" :alt="name" :src="avatar">
+          <p class="name">{{name}}</p>
         </header>
         <footer>
           <input class="search" type="text" placeholder="search user...">
@@ -12,13 +12,13 @@
       </div>
       <div class="list">
         <ul>
-          <li class="active">
-            <img class="avatar"  width="30" height="30" alt="TyCoding" src="http://cdn.tycoding.cn/author.png">
-            <p class="name">TyCoding</p>
+          <li :class="{ active: current_window_id === 0 }" @click="selectWindow(0)">
+            <img class="avatar" width="30" height="30" src="/avatar/group.png">
+            <p class="name">官方群组</p>
           </li>
-          <li class="">
-            <img class="avatar"  width="30" height="30" alt="TyCoding" src="http://cdn.tycoding.cn/author.png">
-            <p class="name">Tumo</p>
+          <li v-for="item in userList" :class="{ active: current_window_id === item.id }" @click="selectWindow(item.id)">
+            <img class="avatar" width="30" height="30" :alt="item.name" :src="item.avatar">
+            <p class="name">{{item.name}}</p>
           </li>
         </ul>
       </div>
@@ -32,6 +32,7 @@
             </p>
             <div class="main">
               <img class="avatar" width="30" height="30" src="http://cdn.tycoding.cn/author.png" />
+              <span class="main-name">Tumo</span>
               <div class="text">我是Tumo</div>
             </div>
           </li>
@@ -41,13 +42,14 @@
             </p>
             <div class="main self">
               <img class="avatar" width="30" height="30" src="http://cdn.tycoding.cn/author.png" />
+              <span class="main-name">TyCoding</span>
               <div class="text">我是TyCoding</div>
             </div>
           </li>
         </ul>
       </div>
       <div class="text">
-        <textarea placeholder="按 Ctrl + Enter 发送"></textarea>
+        <textarea placeholder="按 Enter 键发送"></textarea>
         <div class="btn">
           <el-button size="mini" type="success">清空</el-button>
           <el-button size="mini" type="success">发送</el-button>
@@ -58,11 +60,69 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   export default {
     name: "chat",
+    computed: {
+      ...mapGetters([
+        'id',
+        'name',
+        'avatar'
+      ])
+    },
     data() {
       return {
+        //当前激活窗口ID
+        current_window_id: 0,
+        userList: []
+      }
+    },
+    created() {
+      this.init();
+    },
+    methods: {
+      _notify(message, type) {
+        this.$message({
+          message: message,
+          type: type
+        })
+      },
 
+      init() {
+        //加载官方群组窗口
+        var websocket = new WebSocket('ws://localhost:5002/chat/' + this.id)
+        websocket.onerror = function() {
+          console.log('链接错误')
+        }
+        websocket.onopen = function() {
+          console.log('链接成功')
+          websocket.send('Hi my name is tycoding')
+        }
+
+
+        //加载在线用户列表
+        let list = [
+          {id: 1, name: 'tycoding', avatar: '/avatar/20180414165754.jpg'},
+          {id: 2, name: 'tumo', avatar: '/avatar/20180414165815.jpg'},
+          {id: 3, name: 'user', avatar: '/avatar/20180414165821.jpg'},
+        ]
+        this.userList = list
+      },
+
+      //切换选择窗口
+      selectWindow(id) {
+        this.current_window_id = id;
+      },
+
+      send(form) {
+        this.$refs[form].validate((valid) => {
+          if (valid) {
+
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
       }
     }
   }
@@ -184,6 +244,13 @@
       float: left;
       margin: 0 10px 0 0;
       border-radius: 3px;
+    }
+    .main-name{
+      font-size: 11px;
+      color: gray;
+      display: inherit;
+      font-weight: 500;
+      margin-bottom: 5px;
     }
     .text {
       height: auto !important;
