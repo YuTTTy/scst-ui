@@ -99,7 +99,6 @@
           websocket.send('Hi my name is tycoding')
         }
 
-
         //加载在线用户列表
         let list = [
           {id: 1, name: 'tycoding', avatar: '/avatar/20180414165754.jpg'},
