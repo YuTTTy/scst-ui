@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import axios from 'axios'
 
 import Cookies from 'js-cookie'
 
@@ -27,6 +28,8 @@ Vue.use(Element, {
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
+
+axios.defaults.headers.post['Authorization'] = 'Basic Y2xpZW50OnNlY3JldA==';
 
 Vue.config.productionTip = false
 

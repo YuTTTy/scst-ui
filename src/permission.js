@@ -5,6 +5,8 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import { buildMenus } from '@/api/menu'
+import { filterAsyncRouter } from '@/store/modules/permission'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -31,20 +33,31 @@ router.beforeEach(async(to, from, next) => {
       if (hasRoles) {
         next()
       } else {
+        // no roles, get user info before load menu tree
         try {
+          // // get user info
+          // // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
+          // const { roles } = await store.dispatch('user/getInfo')
+          //
+          // // generate accessible routes map based on roles
+          // const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          //
+          // // dynamically add accessible routes
+          // router.addRoutes(accessRoutes)
+          //
+          // // hack method to ensure that addRoutes is complete
+          // // set the replace: true, so the navigation will not leave a history record
+          // next({ ...to, replace: true })
+
           // get user info
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
-
-          // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-
-          // dynamically add accessible routes
-          router.addRoutes(accessRoutes)
-
-          // hack method to ensure that addRoutes is complete
-          // set the replace: true, so the navigation will not leave a history record
-          next({ ...to, replace: true })
+          store.dispatch('user/getInfo').then(res => {
+            // load menu tree
+            loadMenus(next, to)
+          }).catch(error => {
+            store.dispatch('user/logout').then(() => {
+              location.reload()
+            })
+          })
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
@@ -56,7 +69,6 @@ router.beforeEach(async(to, from, next) => {
     }
   } else {
     /* has no token*/
-
     if (whiteList.indexOf(to.path) !== -1) {
       // in the free login whitelist, go directly
       next()
@@ -67,6 +79,18 @@ router.beforeEach(async(to, from, next) => {
     }
   }
 })
+
+// load menu tree from api
+export const loadMenus = (next, to) => {
+  buildMenus().then(res => {
+    const asyncRouter = filterAsyncRouter(res.data)
+    // asyncRouter.push({ path: '*', redirect: '/404', hidden: true })
+    store.dispatch('permission/generateRoutes', asyncRouter).then(() => {
+      router.addRoutes(asyncRouter)
+      next({ ...to, replace: true })
+    })
+  })
+}
 
 router.afterEach(() => {
   // finish progress bar

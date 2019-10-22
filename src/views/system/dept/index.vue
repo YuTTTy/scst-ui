@@ -40,13 +40,6 @@
       this.search();
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
-
       //获取权限按钮列表
       search() {
         this.loading = true;
@@ -82,15 +75,11 @@
           type: 'warning'
         }).then(() => {
           deleteDept(id).then(response => {
-            if (response.code == 200) {
-              this._notify('删除成功', 'success')
-            } else {
-              this._notify(response.msg, 'error')
-            }
+            this.$message.success(response.msg)
             this.search()
           })
         }).catch(() => {
-          this._notify('已取消删除', 'info')
+          this.$message.info('已取消删除')
         });
       },
     },

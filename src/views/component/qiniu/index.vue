@@ -1,168 +1,158 @@
 <template>
-  <div class="qiniu-container">
-    <!-- 查询结果 -->
-    <el-table :data="list" size="small" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" border fit highlight-current-row>
-      <el-table-column align="center" label="对象KEY" width="270" prop="key"></el-table-column>
-      <el-table-column align="center" label="对象名称" width="260" prop="name"></el-table-column>
-      <el-table-column align="center" label="对象类型" width="150" prop="type"></el-table-column>
-      <el-table-column align="center" label="对象大小(kb)" width="150">
+  <div class="app-container">
+    <div class="filter-container">
+      <el-button class="filter-item" size="mini" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="dialogAddVisible = true">
+        新增
+      </el-button>
+    </div>
+
+    <el-table
+      v-loading="listLoading"
+      :data="list"
+      element-loading-text="Loading"
+      border
+      fit
+      size="mini"
+      highlight-current-row
+    >
+      <el-table-column align="center" label="Key" width="280">
         <template slot-scope="scope">
-          {{scope.row.size / 1000}} kb
+          {{ scope.row.key }}
         </template>
       </el-table-column>
-      <el-table-column align="center" property="url" width="100" label="预览图">
+      <el-table-column label="名称">
         <template slot-scope="scope">
-          <a :href="scope.row.url" target="_blank" style="color:#409EFF;">
-            <img :src="scope.row.url" width="40">
-          </a>
+          {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="链接地址" prop="url"></el-table-column>
-      <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="类型" width="120">
         <template slot-scope="scope">
-          <a :href="scope.row.url" target="_blank" style="color:#409EFF;">
-            <el-button type="success" size="mini" icon="el-icon-download"></el-button>
-          </a>
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.name)" icon="el-icon-edit"></el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(scope.row.name)" style="margin-left: 0px;" icon="el-icon-delete"></el-button>
+          {{ scope.row.type }}
+        </template>
+      </el-table-column>
+      <el-table-column label="大小" width="120">
+        <template slot-scope="scope">
+          {{ scope.row.size }}
+        </template>
+      </el-table-column>
+      <el-table-column label="外链地址">
+        <template slot-scope="scope">
+          <a :href="scope.row.url" target="_blank">{{ scope.row.url }}</a>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            Edit
+          </el-button>
+          <el-button size="mini" type="danger" @click="handleDel(row.id)">
+            Delete
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 修改 -->
+    <el-dialog title="修改" :visible.sync="dialogVisible" width="30%" :append-to-body='true'
+               :before-close="handleClose">
+        <span>
+            <el-input placeholder="请输入名称" v-model="form.name" style="margin-bottom: 12px">
+                <template slot="prepend">名称</template>
+            </el-input>
+        </span>
+      <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitAction">确 定</el-button>
+        </span>
+    </el-dialog>
+    <!-- 新增 -->
+    <el-dialog title="文件上传" :visible.sync="dialogAddVisible" width="30%" :append-to-body='true'
+               :before-close="handleClose">
+        <span>
+            <el-upload
+              :headers="tokenHeader"
+              :action="qiNiuUploadApi"
+              :file-list="fileList">
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+        </span>
+      <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogAddVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitAction">确 定</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import {getFiles,deleteFile,updateFile} from '@/api/qiniu'
+  import { mapGetters } from 'vuex'
+  import { getList, del, update } from '@/api/qiniu'
   export default {
-    name: "index",
+    computed: {
+      ...mapGetters([
+        'qiNiuUploadApi',
+        'token'
+      ])
+    },
     data() {
       return {
-        loading: false,
-        rules: {
-          newname: [{required: true, message: '对象名称不能为空', trigger: 'blur'}]
-        },
-        dataForm: {
-          oldname: '',
-          newname: '',
-        },
-        list: [],
+        list: null,
+        listLoading: true,
+        form: {},
+        fileList: [],
+        tokenHeader: {},
         dialogVisible: false,
-        createDialogVisible: false
+        dialogAddVisible: false
       }
     },
     created() {
-      this.search();
+      this.tokenHeader = {'Authorization': this.token}
+      this.fetchData()
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
+      fetchData() {
+        this.listLoading = true
+        getList().then(response => {
+          this.list = response.data.rows
+          this.listLoading = false
         })
       },
-      search() {
-        this.loading = true;
-        getFiles().then(response => {
-          this.list = response.body.data.rows;
-          this.loading = false;
-        })
+      handleUpdate(row) {
+        this.form = row
+        this.dialogVisible = true
       },
-
-      //触发关闭按钮
+      submitAction() {
+        update(this.form).then(res => {
+          this.$message.success(res.msg)
+          this.fetchData()
+        })
+        this.handleClose()
+      },
       handleClose() {
-        this.dialogVisible = false; //关闭模态框
+        this.form = {}
+        this.dialogVisible = false
+        this.dialogAddVisible = false
       },
-
-      //触发删除按钮
-      handleDelete(name) {
-        this.$confirm('你确定永久删除此文件？', '提示', {
+      handleDel(id) {
+        this.$confirm('你确定永久删除此条记录？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
           center: true
         }).then(() => {
-          deleteFile(name).then(response => {
-            if (response.code != 200) {
-              this._notify(response.body.msg, 'success')
-            } else {
-              this._notify(response.body.msg, 'error')
-            }
-            this.search();
+          del(id).then(response => {
+            this.$message.success(response.msg)
+            this.fetchData();
           });
         }).catch(() => {
-          this._notify('已取消删除', 'info');
+          this.$message.info('已取消删除')
         });
-      },
-
-      //触发新增按钮
-      handleSave() {
-        this.createDialogVisible = true;
-      },
-
-      //上传
-      upload(item) {
-        console.log(item);
-        const formData = new FormData()
-        formData.append('file', item.file)
-        updateFile(formData).then(response => {
-          this.createDialogVisible = false
-          if (response.body.code == 200) {
-            this._notify(response.body.msg, 'success')
-          } else {
-            this._notify(response.body.msg, 'error')
-          }
-          this.search();
-        })
-      },
-
-      //触发更新按钮
-      handleUpdate(name) {
-        this.dataForm.oldname = name;
-        this.dataForm.newname = name;
-        this.updateDialogVisible = true
-      },
-
-      update() {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            console.log(this.dataForm);
-            this.$http.get(api.storage.qiniu.updateOne(this.dataForm.oldname, this.dataForm.newname)).then(response => {
-              this.updateDialogVisible = false
-              if (response.body.code == 200) {
-                this._notify(response.body.msg, 'success')
-              } else {
-                this._notify(response.body.msg, 'error')
-              }
-              this.search();
-            })
-          }
-        })
-      },
-
-      //文件上传前的前的钩子函数
-      beforeUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isGIF = file.type === 'image/gif';
-        const isPNG = file.type === 'image/png';
-        const isBMP = file.type === 'image/bmp';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isJPG && !isGIF && !isPNG && !isBMP) {
-          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传图片大小不能超过 2MB!');
-        }
-        return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
       },
     }
   }
 </script>
-
-<style scoped>
-  .qiniu-container {
-    padding: 32px;
-    background-color: rgb(240, 242, 245);
-    position: relative;
+<style lang="scss" scoped>
+  a {
+    color: #20a0ff;
   }
 </style>

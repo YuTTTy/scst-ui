@@ -59,7 +59,7 @@
         date: parseTime(new Date().getTime(), ''),
         loginForm: {
           username: 'admin',
-          password: '111111'
+          password: 'admin'
         },
         loginRules: {
           username: [{required: true, trigger: 'blur'}],

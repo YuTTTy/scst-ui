@@ -73,11 +73,7 @@
         searchEntity: {}, //查询实体类
         listQuery: {
           page: 1,
-          limit: 10,
-          importance: undefined,
-          title: undefined,
-          type: undefined,
-          sort: '+id'
+          limit: 10
         },
         total: 0,
         sonData: null,
@@ -110,12 +106,6 @@
       this.search();
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
       init() {
         //获取Dept Tree
         getDeptTree().then(response => {
@@ -173,11 +163,7 @@
           type: 'warning'
         }).then(() => {
           deleteUser(id).then(response => {
-            if (response.code == 200) {
-              this._notify('删除成功', 'success')
-            } else {
-              this._notify(response.msg, 'error')
-            }
+            this.$message.success(response.msg)
             this.$refs.table.clearSelection();
             this.selectIds = [];
             this.search()

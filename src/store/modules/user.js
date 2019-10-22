@@ -35,14 +35,13 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const data = response.data
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+      login(userInfo).then(response => {
+        commit('SET_TOKEN', response.access_token)
+        setToken(response.access_token)
         resolve()
       }).catch(error => {
+        console.log(error)
         reject(error)
       })
     })
@@ -57,18 +56,15 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { id, roles, name, avatar, introduction } = data
-
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
+        if (!data.roles || data.roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
 
-        commit('SET_ID', id);
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
+        commit('SET_ID', data.sysUser.id);
+        commit('SET_ROLES', data.roles)
+        commit('SET_NAME', data.sysUser.username)
+        commit('SET_AVATAR', data.sysUser.avatar)
         resolve(data)
       }).catch(error => {
         reject(error)

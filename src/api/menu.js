@@ -8,12 +8,19 @@ export function getMenus(query, data) {
   })
 }
 
-/**
- * 获取菜单权限Tree
- */
 export function getMenuTree() {
   return request({
     url: '/system/menu/tree',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取左侧菜单权限Tree
+ */
+export function buildMenus() {
+  return request({
+    url: '/system/menu/build',
     method: 'get',
   })
 }

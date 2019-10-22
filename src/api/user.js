@@ -4,7 +4,11 @@ export function login(data) {
   return request({
     url: '/auth/oauth/token',
     method: 'post',
-    data
+    params: {
+      username: data.username,
+      password: data.password,
+      grant_type: 'password'
+    }
   })
 }
 

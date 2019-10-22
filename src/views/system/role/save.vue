@@ -72,12 +72,6 @@
       }
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
       clearForm() {
         this.form = {}
       },
@@ -91,23 +85,23 @@
             if (this.form.id == null) {
               addRole(this.form).then(response => {
                 if (response.code === 200) {
-                  this._notify(response.msg, 'success')
+                  this.$message.success(response.msg)
                   this.clearForm()
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
-                  this._notify(response.msg, 'error')
+                  this.$message.error(response.msg)
                 }
               })
             } else {
               updateRole(this.form).then(response => {
                 if (response.code === 200) {
-                  this._notify(response.msg, 'success')
+                  this.$message.success(response.msg)
                   this.clearForm()
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
-                  this._notify(response.msg, 'error')
+                  this.$message.error(response.msg)
                 }
               })
             }

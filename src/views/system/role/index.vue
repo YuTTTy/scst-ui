@@ -60,7 +60,7 @@
   import Pagination from '@/components/Pagination'
   import Save from './save'
   import { getRoles, findRole, deleteRole, updateRole } from "@/api/role"
-  import { getMenuTree } from "@/api/menu";
+  import { buildMenus } from "@/api/menu";
 
   export default {
     name: "index",
@@ -71,11 +71,7 @@
         searchEntity: {},
         listQuery: {
           page: 1,
-          limit: 10,
-          importance: undefined,
-          title: undefined,
-          type: undefined,
-          sort: '+id'
+          limit: 10
         },
         total: 0,
         sonData: null,
@@ -94,15 +90,9 @@
       this.search();
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
       init() {
         //获取菜单Tree
-        getMenuTree().then(response => {
+        buildMenus().then(response => {
           this.menuTree = response.data
         })
       },
@@ -166,11 +156,7 @@
           this.search();
           this.$refs.tree.setCheckedKeys([]);
           this.form = {}
-          if (response.code == 200) {
-            this._notify('更新权限列表成功', 'success')
-          } else {
-            this._notify('更新权限列表失败', 'error')
-          }
+          this.$message.success(response.msg)
         })
       },
 
@@ -182,16 +168,12 @@
           type: 'warning'
         }).then(() => {
           deleteRole(id).then(response => {
-            if (response.code == 200) {
-              this._notify('删除成功', 'success')
-            } else {
-              this._notify('删除失败', 'error')
-            }
+            this.$message.success(response.msg)
             this.$refs.table.clearSelection();
             this.search()
           })
         }).catch(() => {
-          this._notify('已取消删除', 'info')
+          this.$message.info('已取消删除')
         });
       },
     },

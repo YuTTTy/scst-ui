@@ -1,24 +1,29 @@
 import request from '@/utils/request'
 
-export function getFiles(query, data) {
+export function getList() {
   return request({
-    url: `/component/qiniu/list`,
-    method: 'post',
-    data
+    url: `/api/qiniu/list`,
+    method: 'get'
   })
 }
 
-export function deleteFile(id) {
+export function del(id) {
   return request({
-    url: `/component/qiniu/${id}`,
+    url: `/api/qiniu/${id}`,
     method: 'delete'
   })
 }
 
-export function updateFile(data) {
+export function update(oldname, newname) {
   return request({
-    url: '/component/qiniu',
-    method: 'put',
-    data
+    url: `/api/qiniu/update?oldname=${oldname}&newname=${newname}`,
+    method: 'put'
+  })
+}
+
+export function download(name) {
+  return request({
+    url: `/api/qiniu/download?name=${name}`,
+    method: 'get'
   })
 }

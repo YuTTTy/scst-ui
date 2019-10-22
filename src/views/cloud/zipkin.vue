@@ -1,11 +1,19 @@
 <template>
-  <h1>Zipkin 链路监控</h1>
+  <targetWindow :targetUrl="url"></targetWindow>
 </template>
 
 <script>
-    export default {
-        name: "zipkin"
+  import targetWindow from '@/components/Iframe'
+
+  export default {
+    name: "zipkin",
+    components: {targetWindow},
+    data() {
+      return {
+        url: 'http://localhost:3001'
+      }
     }
+  }
 </script>
 
 <style scoped>

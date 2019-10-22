@@ -84,12 +84,6 @@
       })
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
       clearForm() {
         if (this.$refs['form'] !== undefined) {
           this.$refs['form'].resetFields();
@@ -122,23 +116,23 @@
             if (this.form.id == null) {
               addDept(this.form).then(response => {
                 if (response.code === 200) {
-                  this._notify('新增部门成功', 'success')
+                  this.$message.success(response.msg)
                   this.clearForm()
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
-                  this._notify('新增部门失败', 'error')
+                  this.$message.error(response.msg)
                 }
               })
             } else {
               updateDept(this.form).then(response => {
                 if (response.code === 200) {
-                  this._notify('修改部门成功', 'success')
+                  this.$message.success(response.msg)
                   this.clearForm()
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
-                  this._notify('修改部门失败', 'error')
+                  this.$message.error(response.msg)
                 }
               })
             }

@@ -135,12 +135,6 @@
       })
     },
     methods: {
-      _notify(message, type) {
-        this.$message({
-          message: message,
-          type: type
-        })
-      },
       clearForm() {
         this.form = {
           id: null,
@@ -164,31 +158,31 @@
         this.$refs[form].validate((valid) => {
           if (valid) {
             if (!this.deptId.length) {
-              this._notify('请选择用户所属部门', 'warning')
+              this.$message.error('请选择用户所属部门')
               return;
             }
             this.form.deptId = this.deptId[0]
             if (this.form.id == null) {
               addUser(this.form).then(response => {
                 if (response.code === 200) {
-                  this._notify(response.msg, 'success')
+                  this.$message.success(response.msg)
                   this.clearForm();
                   //通知父组件刷新表格
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
-                  this._notify(response.msg, 'error')
+                  this.$message.error(response.msg)
                 }
               })
             } else {
               updateUser(this.form).then(response => {
                 if (response.code === 200) {
-                  this._notify(response.msg, 'success')
+                  this.$message.success(response.msg)
                   this.clearForm();
                   this.$emit('sonStatus', true)
                   this.dialogVisible = false
                 } else {
-                  this._notify(response.msg, 'error')
+                  this.$message.error(response.msg)
                 }
               })
             }
