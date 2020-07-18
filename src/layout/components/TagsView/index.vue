@@ -1,6 +1,6 @@
 <template>
   <div id="tags-view-container" class="tags-view-container">
-    <scroll-pane ref="scrollPane" class="tags-view-wrapper">
+    <scroll-pane ref="scrollPane" class="tags-view-wrapper" @scroll="handleScroll">
       <router-link
         v-for="tag in visitedViews"
         ref="tag"
@@ -9,18 +9,18 @@
         :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
         tag="span"
         class="tags-view-item"
-        @click.middle.native="closeSelectedTag(tag)"
+        @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
         {{ tag.title }}
-        <span v-if="!tag.meta.affix" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+        <span v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
       </router-link>
     </scroll-pane>
-    <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
-      <li @click="refreshSelectedTag(selectedTag)">Refresh</li>
-      <li v-if="!(selectedTag.meta&&selectedTag.meta.affix)" @click="closeSelectedTag(selectedTag)">Close</li>
-      <li @click="closeOthersTags">Close Others</li>
-      <li @click="closeAllTags(selectedTag)">Close All</li>
+    <ul v-show="visible" :style="{left:left+'px'}" class="contextmenu">
+      <li @click="refreshSelectedTag(selectedTag)">刷新</li>
+      <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">关闭</li>
+      <li @click="closeOthersTags">关闭其他</li>
+      <li @click="closeAllTags(selectedTag)">关闭所有</li>
     </ul>
   </div>
 </template>
@@ -68,6 +68,9 @@ export default {
   methods: {
     isActive(route) {
       return route.path === this.$route.path
+    },
+    isAffix(tag) {
+      return tag.meta && tag.meta.affix
     },
     filterAffixTags(routes, basePath = '/') {
       let tags = []
@@ -155,7 +158,7 @@ export default {
     toLastView(visitedViews, view) {
       const latestView = visitedViews.slice(-1)[0]
       if (latestView) {
-        this.$router.push(latestView)
+        this.$router.push(latestView.fullPath)
       } else {
         // now the default is to redirect to the home page if there is no tags-view,
         // you can adjust it according to your needs.
@@ -186,52 +189,44 @@ export default {
     },
     closeMenu() {
       this.visible = false
+    },
+    handleScroll() {
+      this.closeMenu()
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  ::v-deep .scroll-container .el-scrollbar__wrap{
+    height: 40px !important;
+  }
 .tags-view-container {
-  height: 34px;
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #d8dce5;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+  user-select: none;
+  position: relative;
+  padding: 0 10px;
+  margin-bottom: 10px;
+  border-top: 1px solid #f6f6f6;
+  background-color: #fff;
+  -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
   .tags-view-wrapper {
+    height: 40px;
     .tags-view-item {
       display: inline-block;
       position: relative;
       cursor: pointer;
-      height: 26px;
-      line-height: 26px;
-      border: 1px solid #d8dce5;
+      height: 36px;
+      line-height: 36px;
       color: #495060;
       background: #fff;
-      padding: 0 8px;
+      padding: 0 13px;
       font-size: 12px;
       margin-left: 5px;
       margin-top: 4px;
-      &:first-of-type {
-        margin-left: 15px;
-      }
-      &:last-of-type {
-        margin-right: 15px;
-      }
       &.active {
-        background-color: #42b983;
-        color: #fff;
-        border-color: #42b983;
-        &::before {
-          content: '';
-          background: #fff;
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          position: relative;
-          margin-right: 2px;
-        }
+        color: #409eff;
+        border-bottom: 3px solid #409eff;
       }
     }
   }

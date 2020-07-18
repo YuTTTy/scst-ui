@@ -1,29 +1,25 @@
 module.exports = {
-  title: 'Spring Cloud Security Template',
+  title: 'SCST',
 
   /**
-   * @type {boolean} true | false
-   * @description Whether show the settings right-panel
+   * 是否展示设置按钮
    */
   showSettings: true,
 
   /**
-   * @type {boolean} true | false
-   * @description Whether need tagsView
+   * 是否展示Tags标签
    */
   tagsView: true,
 
   /**
-   * @type {boolean} true | false
-   * @description Whether fix the header
+   * 是否固定Header
    */
   fixedHeader: true,
 
   /**
-   * @type {boolean} true | false
-   * @description Whether show the logo in sidebar
+   * 是否展示侧边栏Logo
    */
-  sidebarLogo: false,
+  sidebarLogo: true,
 
   /**
    * @type {string | array} 'production' | ['production', 'development']

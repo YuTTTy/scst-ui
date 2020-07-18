@@ -1,21 +1,26 @@
 <template>
   <div class="drawer-container">
     <div>
-      <h3 class="drawer-title">系统布局配置</h3>
+      <h3 class="drawer-title">页面样式设置</h3>
 
       <div class="drawer-item">
-        <span>显示 Logo</span>
-        <el-switch v-model="sidebarLogo" class="drawer-switch" />
+        <span>主题选择</span>
+        <theme-picker style="float: right;height: 26px;margin: -3px 8px 0 0;" @change="themeChange" />
       </div>
 
       <div class="drawer-item">
-        <span>开启 Tags-View</span>
+        <span>打开标签页</span>
         <el-switch v-model="tagsView" class="drawer-switch" />
       </div>
 
       <div class="drawer-item">
-        <span>固定 Header</span>
+        <span>固定Header</span>
         <el-switch v-model="fixedHeader" class="drawer-switch" />
+      </div>
+
+      <div class="drawer-item">
+        <span>展示侧边栏Logo</span>
+        <el-switch v-model="sidebarLogo" class="drawer-switch" />
       </div>
 
     </div>
@@ -23,8 +28,10 @@
 </template>
 
 <script>
+import ThemePicker from '@/components/ThemePicker'
 
 export default {
+  components: { ThemePicker },
   data() {
     return {}
   },
@@ -64,6 +71,12 @@ export default {
     }
   },
   methods: {
+    themeChange(val) {
+      this.$store.dispatch('settings/changeSetting', {
+        key: 'theme',
+        value: val
+      })
+    }
   }
 }
 </script>
