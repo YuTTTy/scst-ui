@@ -17,7 +17,7 @@ function checkPermission(el, binding) {
       }
     }
   } else {
-    throw new Error(`need roles! Like v-permission="['admin','editor']"`)
+    throw new Error(`该角色没有操作权限`)
   }
 }
 

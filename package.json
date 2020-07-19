@@ -1,15 +1,14 @@
 {
-  "name": "vue-element-admin",
+  "name": "SCST-UI",
   "version": "4.4.0",
-  "description": "A magical vue admin. An out-of-box UI solution for enterprise applications. Newest development stack of vue. Lots of awesome features",
-  "author": "Pan <panfree23@gmail.com>",
+  "description": "一套基于SpringCloud Alibaba & Nacos构建的分布式权限管理系统",
+  "author": "TyCoding",
   "scripts": {
     "dev": "vue-cli-service serve",
     "lint": "eslint --ext .js,.vue src",
     "build:prod": "vue-cli-service build",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
-    "new": "plop",
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml",
     "test:unit": "jest --clearCache && vue-cli-service test:unit",
     "test:ci": "npm run lint && npm run test:unit"
@@ -46,8 +45,6 @@
     "html-webpack-plugin": "3.2.0",
     "husky": "1.3.1",
     "lint-staged": "8.1.5",
-    "mockjs": "1.0.1-beta3",
-    "plop": "2.3.0",
     "runjs": "4.3.2",
     "sass": "1.26.2",
     "sass-loader": "8.0.2",
@@ -91,6 +88,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PanJiaChen/vue-element-admin.git"
+    "url": "git+https://github.com/TyCoding/scst.git"
   }
 }
