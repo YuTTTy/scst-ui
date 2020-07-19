@@ -1,12 +1,14 @@
-# Vue Element Admin
+# Spring Cloud Security Template 分布式权限管理项目 -- 前端
 
-> 基于`@PanJiaChen vue-element-admin`最新版
+> SCST. 基于SpringCloud Alibaba & Nacos构建的分布式权限管理系统  :rocket:
 
-## Features
+**项目后端源码：[https://github.com/TyCoding/scst](https://github.com/TyCoding/scst)**
 
-- 精简原项目`vue-element-admin`，仅留下最基础的页面，其他第三方依赖全部删除
-- 改变了原项目的布局样式，按照个人认为的风格进行了修改
-- 提供一个最基础的`vue-element-admin`项目模板
+**项目文档：[https://docs.scst.tycoding.cn](https://docs.scst.tycoding.cn)**
+
+**项目正在完善中...**
+
+欢迎star,fork关注
 
 ## Getting started
 
@@ -36,6 +38,16 @@ npm run build:stage
 npm run build:prod
 ```
 
+## Docs
+
+**项目文档：[https://docs.scst.tycoding.cn](https://docs.scst.tycoding.cn)**
+
+后续将在我的公众号 **程序员涂陌** 中陆续发布，请持续关注！
+
+| 程序员涂陌                                                  |
+| ----------------------------------------------------------- |
+| ![qrcode_for_gh](http://cdn.tycoding.cn/20200610184737.jpg) |
+
 ## Preview
 
 ![截屏2020-07-11 下午12.10.47](http://cdn.tycoding.cn/20200711121103.png)
@@ -46,5 +58,13 @@ npm run build:prod
 
 ![截屏2020-07-11 下午12.14.30](http://cdn.tycoding.cn/20200711121433.png)
 
+# 交流
 
+QQGroup：671017003   
 
+WeChatGroup:  关注公众号查看
+
+# 联系
+
+- [http://www.tycoding.cn](http://www.tycoding.cn)
+- [https://github.com/TyCoding](https://github.com/TyCoding)

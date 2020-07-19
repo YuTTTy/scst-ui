@@ -106,7 +106,7 @@ export const asyncRoutes = [
     children: [
       {
         path: 'https://github.com/TyCoding/scst',
-        meta: { title: 'Github', icon: 'star' }
+        meta: { title: 'Github', icon: 'github' }
       }
     ]
   }

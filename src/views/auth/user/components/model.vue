@@ -14,7 +14,7 @@
         label="密码"
         label-width="80px"
       >
-        <el-input v-model="form.password" type="password" :disabled="form.id!==undefined" placeholder="请输入登录密码" />
+        <el-input v-model="form.password" type="password" :disabled="form.id!=undefined" placeholder="请输入登录密码" />
       </el-form-item>
       <el-form-item
         prop="roleIds"
@@ -31,9 +31,6 @@
       </el-form-item>
       <el-form-item label="手机">
         <el-input v-model="form.phone" />
-      </el-form-item>
-      <el-form-item label="描述" style="display: block;width: 100%">
-        <el-input v-model="form.description" />
       </el-form-item>
       <el-form-item prop="status" label="状态" style="display: block">
         <el-radio v-model="form.status" border label="true">激活</el-radio>
@@ -123,6 +120,11 @@
           label: 'name'
         },
         avatarDialog: false
+      }
+    },
+    watch: {
+      'form': function(form) {
+        this.deptId = [form.deptId]
       }
     },
     created() {

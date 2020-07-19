@@ -165,7 +165,7 @@
       handleEdit(id) {
         getUserById(id).then(res => {
           if (res.code === 200) {
-            this.form = res.data
+            this.form = res.data.user
             this.dialogVisible = true
           } else {
             this.$message.error(res.msg)
