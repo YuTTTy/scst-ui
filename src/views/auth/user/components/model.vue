@@ -17,15 +17,15 @@
         <el-input v-model="form.password" type="password" :disabled="form.id!=undefined" placeholder="请输入登录密码" />
       </el-form-item>
       <el-form-item
-        prop="roleIds"
+        prop="roles"
         label="角色"
       >
-        <el-select v-model="form.roleIds" multiple placeholder="请选择角色" style="width: 100%">
+        <el-select v-model="form.roles" value-key="id" multiple placeholder="请选择角色" style="width: 100%">
           <el-option
             v-for="item in roleTree"
             :key="item.id"
             :label="item.name"
-            :value="item.id"
+            :value="item"
           />
         </el-select>
       </el-form-item>
@@ -33,8 +33,8 @@
         <el-input v-model="form.phone" />
       </el-form-item>
       <el-form-item prop="status" label="状态" style="display: block">
-        <el-radio v-model="form.status" border label="true">激活</el-radio>
-        <el-radio v-model="form.status" border label="false">锁定</el-radio>
+        <el-radio v-model="form.status" border :label="true">激活</el-radio>
+        <el-radio v-model="form.status" border :label="false">锁定</el-radio>
       </el-form-item>
       <el-form-item prop="deptId" label="部门" style="float: left">
         <el-tree
@@ -112,7 +112,7 @@
         rules: {
           username: { validator: validateName, required: true, trigger: 'blur' },
           password: { required: true, trigger: 'blur', message: '请输入登录密码' },
-          roleIds: { required: true, trigger: 'blur', message: '请选择用户角色' },
+          roles: { required: true, trigger: 'blur', message: '请选择用户角色' },
           status: { required: true, trigger: 'blur', message: '请选择状态' }
         },
         treeProps: {

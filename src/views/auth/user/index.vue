@@ -25,7 +25,7 @@
           </el-input>
           <el-select v-model="query.status" size="small" style="margin-right: 10px;" placeholder="请选择用户状态查询">
             <el-option key="0" label="所有" value="" />
-            <el-option key="1" label="有效" value="true" />
+            <el-option key="1" label="激活" value="true" />
             <el-option key="2" label="锁定" value="false" />
           </el-select>
           <el-button size="mini" icon="el-icon-search" type="success" @click="fetchData">搜索</el-button>
@@ -148,7 +148,7 @@
         return data.name.indexOf(value) !== -1
       },
       handleDeptNodeClick(data) {
-        this.searchEntity.deptId = data.id
+        this.query.deptId = data.id
         this.fetchData()
       },
       fetchData() {
@@ -166,6 +166,7 @@
         getUserById(id).then(res => {
           if (res.code === 200) {
             this.form = res.data.user
+            this.form.roles = res.data.roles
             this.dialogVisible = true
           } else {
             this.$message.error(res.msg)
