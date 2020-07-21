@@ -17,6 +17,13 @@ export function getUserById(id) {
   })
 }
 
+export function getUserByName(name) {
+  return request({
+    url: scstSystemId + `/user/info/${name}`,
+    method: 'get'
+  })
+}
+
 export function addUser(data) {
   return request({
     url: scstSystemId + '/user',
@@ -35,6 +42,14 @@ export function deleteUser(id) {
 export function updateUser(data) {
   return request({
     url: scstSystemId + '/user',
+    method: 'put',
+    data
+  })
+}
+
+export function updatePass(data) {
+  return request({
+    url: scstSystemId + '/updatePass',
     method: 'put',
     data
   })

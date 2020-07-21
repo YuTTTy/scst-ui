@@ -1,134 +1,134 @@
 <template>
-  <el-card style="margin-bottom:20px;">
-    <div slot="header" class="clearfix">
-      <span>About me</span>
-    </div>
-
-    <div class="user-profile">
-      <div class="box-center">
-        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
-          <div>Hello</div>
-          {{ user.role }}
-        </pan-thumb>
+  <div class="app-container">
+    <h4 class="tab-header">基本设置</h4>
+    <div class="tab-view">
+      <div class="tab-left">
+        <el-form ref="form" :model="form" :rules="rules" size="small">
+          <el-form-item label="登录账户" prop="username">
+            <el-input v-model="form.username" />
+          </el-form-item>
+          <el-form-item label="手机" prop="phone">
+            <el-input v-model="form.phone" />
+          </el-form-item>
+          <el-form-item label="所属部门">
+            <el-input v-if="form.dept != null" v-model="form.dept.name" disabled />
+          </el-form-item>
+          <el-form-item label="所属角色">
+            <br>
+            <div v-if="form.roles != null">
+              <el-tag v-for="item in form.roles" :key="item.id">{{ item.name }}</el-tag>
+            </div>
+          </el-form-item>
+        </el-form>
+        <el-button type="primary" size="mini" @click="handleUpdate('form')">更新基本信息</el-button>
       </div>
-      <div class="box-center">
-        <div class="user-name text-center">{{ user.name }}</div>
-        <div class="user-role text-center text-muted">{{ user.role | uppercaseFirst }}</div>
-      </div>
-    </div>
-
-    <div class="user-bio">
-      <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
-        <div class="user-bio-section-body">
-          <div class="text-muted">
-            JS in Computer Science from the University of Technology
-          </div>
-        </div>
-      </div>
-
-      <div class="user-skills user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Skills</span></div>
-        <div class="user-bio-section-body">
-          <div class="progress-item">
-            <span>Vue</span>
-            <el-progress :percentage="70" />
-          </div>
-          <div class="progress-item">
-            <span>JavaScript</span>
-            <el-progress :percentage="18" />
-          </div>
-          <div class="progress-item">
-            <span>Css</span>
-            <el-progress :percentage="12" />
-          </div>
-          <div class="progress-item">
-            <span>ESLint</span>
-            <el-progress :percentage="100" status="success" />
-          </div>
+      <div class="tab-right">
+        <p><label>头像</label></p>
+        <el-avatar :size="100" fit="fill" :src="form.avatar" />
+        <div>
+          <el-button plain size="mini" icon="el-icon-upload2" @click="handleAvatar">更换头像</el-button>
         </div>
       </div>
     </div>
-  </el-card>
+    <Avatar :form="form" :dialog-visible="dialogVisible" />
+  </div>
 </template>
-
 <script>
-import PanThumb from '@/components/PanThumb'
+  import Avatar from './Avatar'
+  import { checkUserName, updateUser } from '@/api/user'
 
-export default {
-  components: { PanThumb },
-  props: {
-    user: {
-      type: Object,
-      default: () => {
-        return {
-          name: '',
-          email: '',
-          avatar: '',
-          role: ''
+  export default {
+    components: { Avatar },
+    props: {
+      form: {
+        type: Object,
+        default() {
+          return {}
         }
+      }
+    },
+    data() {
+      var validateName = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('用户名不能为空'))
+        }
+        checkUserName({ id: this.form.id, username: value }).then(res => {
+          if (res.data) {
+            callback()
+          } else {
+            callback(new Error('用户名已存在'))
+          }
+        })
+      }
+      return {
+        dialogVisible: false,
+        rules: {
+          username: [
+            { validator: validateName, required: true, trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' }
+          ],
+          email: [
+            { required: true, type: 'email', message: '请输入真实姓名', trigger: 'blur' }
+          ]
+        }
+      }
+    },
+    methods: {
+      handleAvatar() {
+        this.dialogVisible = true
+      },
+      changeAvatar() {
+        this.disalogVisible = false
+        updateUser({
+          id: this.form.id,
+          avatar: this.form.avatar
+        }).then(res => {
+          if (res.code === 200) {
+            this.$confirm('更新用户头像成功，重新登录后生效，立即重新登录？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'success'
+            }).then(() => {
+              this.$store.dispatch('user/logout')
+              this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+            })
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+      },
+      handleUpdate(form) {
+        this.$refs[form].validate((valid) => {
+          if (valid) {
+            updateUser(this.form).then(res => {
+              if (res.code === 200) {
+                this.$alert('更新用户信息成功，立即重新登录？', '提示', {
+                  confirmButtonText: '确定',
+                  type: 'success'
+                }).then(() => {
+                  this.$store.dispatch('user/logout')
+                })
+              } else {
+                this.$message.error(res.msg)
+              }
+            })
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
       }
     }
   }
-}
 </script>
-
-<style lang="scss" scoped>
-.box-center {
-  margin: 0 auto;
-  display: table;
-}
-
-.text-muted {
-  color: #777;
-}
-
-.user-profile {
-  .user-name {
-    font-weight: bold;
-  }
-
-  .box-center {
-    padding-top: 10px;
-  }
-
-  .user-role {
-    padding-top: 10px;
-    font-weight: 400;
-    font-size: 14px;
-  }
-
-  .box-social {
-    padding-top: 30px;
-
-    .el-table {
-      border-top: 1px solid #dfe6ec;
-    }
-  }
-
-  .user-follow {
-    padding-top: 20px;
-  }
-}
-
-.user-bio {
-  margin-top: 20px;
-  color: #606266;
-
-  span {
-    padding-left: 4px;
-  }
-
-  .user-bio-section {
-    font-size: 14px;
-    padding: 15px 0;
-
-    .user-bio-section-header {
-      border-bottom: 1px solid #dfe6ec;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-  }
-}
+<style lang="css" scoped>
+  ::v-deep h4.tab-header{margin-bottom:12px;color:rgba(0,0,0,.85);font-weight:500;font-size:20px;line-height:28px}
+  ::v-deep .tab-view{display:flex;padding-top:12px}.tab-left{min-width:280px;max-width:448px}.tab-right{flex:1 1;padding-left:104px}
+  ::v-deep .avatar-img{width:100px;height:100px;display:inline-block;margin:10px;overflow:hidden;position:relative;border-radius:5%}
+  ::v-deep .avatar-img img{width:100px;height:100px;z-index:1}
+  ::v-deep .avatar-img img:hover{cursor:pointer}
+  ::v-deep .avatar-img-label{position:absolute;right:-17px;top:-7px;width:46px;height:26px;background:#13ce66;text-align:center;transform:rotate(45deg);box-shadow:0 1px 1px #ccc}
+  ::v-deep .avatar-img-label .el-icon-check{font-size:12px;margin-top:12px;transform:rotate(-45deg);color:#fff}
 </style>

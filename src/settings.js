@@ -20,5 +20,4 @@ module.exports = {
    * 是否展示侧边栏Logo
    */
   sidebarLogo: true
-
 }
