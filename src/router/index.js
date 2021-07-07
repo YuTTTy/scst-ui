@@ -19,7 +19,7 @@ import Layout from '@/layout'
  * meta : {
     roles: ['admin','editor']    control the page roles (you can set multiple roles)
     title: 'title'               the name show in sidebar and breadcrumb (recommend set)
-    icon: 'svg-name'             the icon show in the sidebar
+    icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
     noCache: true                if set true, the page will no be cached(default is false)
     affix: true                  if set true, the tag will affix in the tags-view
     breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
@@ -39,7 +39,7 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: '/redirect/:path*',
+        path: '/redirect/:path(.*)',
         component: () => import('@/views/redirect/index')
       }
     ]
@@ -56,12 +56,12 @@ export const constantRoutes = [
   },
   {
     path: '/404',
-    component: () => import('@/views/error-page/404'),
+    component: () => import('@/views/error/404'),
     hidden: true
   },
   {
     path: '/401',
-    component: () => import('@/views/error-page/401'),
+    component: () => import('@/views/error/401'),
     hidden: true
   },
   {
@@ -72,8 +72,22 @@ export const constantRoutes = [
       {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
-        name: 'dashboard',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        name: 'Dashboard',
+        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/profile',
+    component: Layout,
+    redirect: '/profile/index',
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: 'Profile', icon: 'user', noCache: true }
       }
     ]
   }
@@ -84,181 +98,16 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-
   {
-    path: 'github',
+    path: '/github',
     component: Layout,
     children: [
       {
-        path: 'https://github.com/TyCoding/cloud-template',
-        meta: { title: '项目地址', icon: 'github3' }
+        path: 'https://github.com/TyCoding/scst',
+        meta: { title: 'Github', icon: 'github' }
       }
     ]
-  },
-
-  {
-    path: '/doc',
-    component: Layout,
-    children: [
-      {
-        path: 'swagger',
-        component: () => import('@/views/doc/index'),
-        name: 'doc',
-        meta: { title: '接口文档', icon: 'documentation' }
-      }
-    ]
-  },
-
-  {
-    path: '/system',
-    component: Layout,
-    name: 'system',
-    meta: {
-      title: '权限管理',
-      icon: 'setting'
-      // roles: ['admin', 'editor'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'user',
-        component: () => import('@/views/system/user/index'),
-        name: 'user',
-        meta: { title: '用户管理', icon: 'peoples' }
-      },
-      {
-        path: 'role',
-        component: () => import('@/views/system/role/index'),
-        name: 'role',
-        meta: { title: '角色管理', icon: 'role' }
-      },
-      {
-        path: 'menu',
-        component: () => import('@/views/system/menu/index'),
-        name: 'menu',
-        meta: { title: '菜单管理', icon: 'menu' }
-      },
-      {
-        path: 'dept',
-        component: () => import('@/views/system/dept/index'),
-        name: 'dept',
-        meta: { title: '部门管理', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/component',
-    component: Layout,
-    name: 'component',
-    meta: {
-      title: '系统组件',
-      icon: 'component'
-      // roles: ['admin', 'editor'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'mail',
-        component: () => import('@/views/component/mail/index'),
-        name: 'mail',
-        meta: { title: '邮件服务', icon: 'email' }
-      },
-      {
-        path: 'alipay',
-        component: () => import('@/views/component/mail/index'),
-        name: 'alipay',
-        meta: { title: '支付服务', icon: 'alipay' }
-      },
-      {
-        path: 'chat',
-        component: () => import('@/views/component/chat/index'),
-        name: 'chat',
-        meta: { title: '在线聊天', icon: 'chat' }
-      },
-      {
-        path: 'qiniu',
-        component: () => import('@/views/component/chat/index'),
-        name: 'qiniu',
-        meta: { title: '七牛云', icon: 'qiniu' }
-      },
-    ]
-  },
-
-  {
-    path: '/monitor',
-    component: Layout,
-    name: 'monitor',
-    meta: {
-      title: '系统监控',
-      icon: 'monitor'
-      // roles: ['admin', 'editor'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'online',
-        component: () => import('@/views/monitor/online/index'),
-        name: 'online',
-        meta: { title: '在线用户', icon: 'online' }
-      },
-      {
-        path: 'logs',
-        component: () => import('@/views/monitor/logs/index'),
-        name: 'logs',
-        meta: { title: '操作日志', icon: 'log' }
-      },
-      {
-        path: 'loginLog',
-        component: () => import('@/views/monitor/loginLog/index'),
-        name: 'loginLog',
-        meta: { title: '登录日志', icon: 'login-log' }
-      },
-      {
-        path: 'errorLog',
-        component: () => import('@/views/monitor/errorLog/index'),
-        name: 'errorLog',
-        meta: { title: '错误日志', icon: 'error-log' }
-      },
-      {
-        path: 'redis',
-        component: () => import('@/views/monitor/redis/index'),
-        name: 'redis',
-        meta: { title: 'Redis监控', icon: 'redis' }
-      },
-    ]
-  },
-
-  {
-    path: '/cloud',
-    component: Layout,
-    name: 'cloud',
-    meta: {
-      title: 'Spring Cloud',
-      icon: 'springcloud'
-      // roles: ['admin', 'editor'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'admin',
-        component: () => import('@/views/cloud/admin'),
-        name: 'admin',
-        meta: { title: '服务监控', icon: 'service-monitor' }
-      },
-      {
-        path: 'zipkin',
-        component: () => import('@/views/cloud/zipkin'),
-        name: 'zipkin',
-        meta: { title: '链路监控', icon: 'zipkin' }
-      },
-      {
-        path: 'eureka',
-        component: () => import('@/views/cloud/eureka'),
-        name: 'eureka',
-        meta: { title: '注册中心', icon: 'service-center' }
-      },
-    ]
-  },
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  }
 ]
 
 const createRouter = () => new Router({

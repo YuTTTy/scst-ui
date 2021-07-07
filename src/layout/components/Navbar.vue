@@ -6,28 +6,35 @@
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
-
+        <el-tooltip content="全屏" effect="dark" placement="bottom">
+          <screenfull id="screenfull" class="right-menu-item hover-effect" />
+        </el-tooltip>
       </template>
 
-      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
-        <div class="avatar-wrapper">
+      <el-tooltip content="用户头像" effect="dark" placement="bottom">
+        <div class="user-avatar-container">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom" />
         </div>
+      </el-tooltip>
+      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+        <span class="el-dropdown-link">
+          {{ name }}<i class="el-icon-arrow-down el-icon--right" />
+        </span>
         <el-dropdown-menu slot="dropdown">
-          <router-link to="/">
-            <el-dropdown-item>首页</el-dropdown-item>
+          <router-link to="/profile/index">
+            <el-dropdown-item>Profile</el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">
+          <router-link to="/">
+            <el-dropdown-item>Dashboard</el-dropdown-item>
+          </router-link>
+          <a target="_blank" href="https://github.com/TyCoding/vue-element-admin/">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
           <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
             <el-dropdown-item>Docs</el-dropdown-item>
           </a>
-          <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">Log Out</span>
+          <el-dropdown-item divided @click.native="logout">
+            <span style="display:block;">Log Out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -51,6 +58,8 @@ export default {
     ...mapGetters([
       'sidebar',
       'avatar',
+      'name',
+      'token',
       'device'
     ])
   },
@@ -59,7 +68,7 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      await this.$store.dispatch('user/logout')
+      await this.$store.dispatch('user/logout', this.token)
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }
@@ -68,14 +77,14 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
-  height: 50px;
+  height: 64px;
   overflow: hidden;
   position: relative;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
 
   .hamburger-container {
-    line-height: 46px;
+    line-height: 64px;
     height: 100%;
     float: left;
     cursor: pointer;
@@ -83,7 +92,7 @@ export default {
     -webkit-tap-highlight-color:transparent;
 
     &:hover {
-      background: rgba(0, 0, 0, .025)
+      background: #fff
     }
   }
 
@@ -99,7 +108,8 @@ export default {
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
+    line-height: 64px;
+    margin-right: 20px;;
 
     &:focus {
       outline: none;
@@ -109,7 +119,7 @@ export default {
       display: inline-block;
       padding: 0 8px;
       height: 100%;
-      font-size: 18px;
+      font-size: 12px;
       color: #5a5e66;
       vertical-align: text-bottom;
 
@@ -118,33 +128,34 @@ export default {
         transition: background .3s;
 
         &:hover {
-          background: rgba(0, 0, 0, .025)
+          background: #fff
         }
       }
     }
 
-    .avatar-container {
-      margin-right: 30px;
+    .user-avatar-container{
+      display: inline-block;
+      padding: 0;
+      height: 100%;
+      font-size: 14px;
+      color: #5a5e66;
+      vertical-align: text-bottom;
+    }
 
-      .avatar-wrapper {
-        margin-top: 5px;
-        position: relative;
+    .user-avatar {
+      margin: 0 8px 0 5px;
+      padding: 2px;
+      width: 30px;
+      height: 30px;
+      border-radius: 100%;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      border: 1px solid #eee;
+      vertical-align: middle;
+    }
 
-        .user-avatar {
-          cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-        }
-
-        .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
-        }
-      }
+    .avatar-container{
+      padding: 0px;
     }
   }
 }

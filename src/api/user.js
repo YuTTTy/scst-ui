@@ -1,46 +1,32 @@
 import request from '@/utils/request'
+import constants from '@/store/modules/constants'
+const scstSystemId = constants.state.services.scstSystem
 
-export function login(data) {
+export function getUserList(query, data) {
   return request({
-    url: '/auth/oauth/token',
+    url: scstSystemId + `/user/list?page=${query.page}&limit=${query.limit}`,
     method: 'post',
     data
   })
 }
 
-export function logout() {
+export function getUserById(id) {
   return request({
-    url: '/auth/user/logout',
+    url: scstSystemId + `/user/${id}`,
     method: 'get'
   })
 }
 
-export function getInfo(token) {
+export function getUserByName(name) {
   return request({
-    url: '/system/user/info',
-    method: 'get',
-    params: { token }
-  })
-}
-
-export function getUsers(query, data) {
-  return request({
-    url: `/system/user/list?page=${query.page}&limit=${query.limit}`,
-    method: 'post',
-    data
-  })
-}
-
-export function findUser(id) {
-  return request({
-    url: `/system/user/${id}`,
+    url: scstSystemId + `/user/info/${name}`,
     method: 'get'
   })
 }
 
 export function addUser(data) {
   return request({
-    url: '/system/user',
+    url: scstSystemId + '/user',
     method: 'post',
     data
   })
@@ -48,29 +34,38 @@ export function addUser(data) {
 
 export function deleteUser(id) {
   return request({
-    url: `/system/user/${id}`,
+    url: scstSystemId + `/user/${id}`,
     method: 'delete'
   })
 }
 
 export function updateUser(data) {
   return request({
-    url: '/system/user',
+    url: scstSystemId + '/user',
+    method: 'put',
+    data
+  })
+}
+
+export function updatePass(data) {
+  return request({
+    url: scstSystemId + '/updatePass',
     method: 'put',
     data
   })
 }
 
 export function getUserMenus(name) {
-  return request ({
-    url: `/system/user/getMenus/${name}`,
-    method: 'get',
+  return request({
+    url: scstSystemId + `/user/getMenus/${name}`,
+    method: 'get'
   })
 }
 
-export function checkUserName(name, id) {
-  return request ({
-    url: `/system/user/checkName/${name}/${id}`,
-    method: 'get'
+export function checkUserName(data) {
+  return request({
+    url: scstSystemId + `/user/checkName`,
+    method: 'post',
+    data
   })
 }

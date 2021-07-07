@@ -1,5 +1,19 @@
 // cover some element-ui styles
 
+.el-dialog__body {
+  padding: 15px 20px 0px 20px;
+}
+
+.cell .el-tag {
+  margin-right: 0px;
+  padding: 0 5px;
+  margin-left: 5px;
+}
+
+.el-popup-parent--hidden .fixed-header {
+  padding-right: 0px !important;
+}
+
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {
   font-weight: 400 !important;
@@ -31,7 +45,7 @@
 .fixed-width {
   .el-button--mini {
     padding: 7px 10px;
-    width: 60px;
+    min-width: 60px;
   }
 }
 
@@ -76,4 +90,9 @@
 // fix date-picker ui bug in filter-item
 .el-range-editor.el-input__inner {
   display: inline-flex !important;
+}
+
+// to fix el-date-picker css style
+.el-range-separator {
+  box-sizing: content-box;
 }

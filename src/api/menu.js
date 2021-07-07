@@ -1,33 +1,31 @@
 import request from '@/utils/request'
+import constants from '@/store/modules/constants'
+const scstSystemId = constants.state.services.scstSystem
 
-export function getMenus(query, data) {
+export function buildMenu() {
   return request({
-    url: '/system/menu/list?pageCode=' + query.page + '&pageSize=' + query.limit,
-    method: 'post',
-    data
+    url: scstSystemId + '/menu/build',
+    method: 'get'
   })
 }
 
-/**
- * 获取菜单权限Tree
- */
 export function getMenuTree() {
   return request({
-    url: '/system/menu/tree',
-    method: 'get',
+    url: scstSystemId + '/menu/tree',
+    method: 'get'
   })
 }
 
-export function findMenu(id) {
+export function getMenuById(id) {
   return request({
-    url: `/system/menu/${id}`,
+    url: scstSystemId + `/menu/${id}`,
     method: 'get'
   })
 }
 
 export function addMenu(data) {
   return request({
-    url: '/system/menu',
+    url: scstSystemId + '/menu',
     method: 'post',
     data
   })
@@ -35,23 +33,22 @@ export function addMenu(data) {
 
 export function deleteMenu(id) {
   return request({
-    url: `/system/menu/${id}`,
+    url: scstSystemId + `/menu/${id}`,
     method: 'delete'
   })
 }
 
 export function updateMenu(data) {
   return request({
-    url: '/system/menu',
+    url: scstSystemId + '/menu',
     method: 'put',
     data
   })
 }
 
 export function checkMenuName(name, id) {
-  return request ({
-    url: `/system/menu/checkName/${name}/${id}`,
+  return request({
+    url: scstSystemId + `/menu/checkName/${name}/${id}`,
     method: 'get'
   })
 }
-
